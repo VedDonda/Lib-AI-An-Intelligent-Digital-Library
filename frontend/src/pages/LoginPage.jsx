@@ -3,15 +3,39 @@ import { motion } from "framer-motion";
 import { Mail, Lock, Loader, BookOpen } from "lucide-react";
 import { Link } from "react-router-dom";
 import Input from "../components/Input";
+import { loginRequest } from "../lib/authApi";
 import "../index.css";
 
 const LoginPage = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
 
     const handleLogin = async (e) => {
-        
+        e.preventDefault();
+        setError("");
+        setSuccess("");
+
+        if (!email.trim() || !password.trim()) {
+            setError("Please enter email and password.");
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            const response = await loginRequest({
+                email: email.trim(),
+                password,
+            });
+            const loggedInName = response?.data?.user?.name || "User";
+            setSuccess(`${loggedInName} logged in successfully.`);
+        } catch (apiError) {
+            setError(apiError.message || "Unable to login.");
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -32,6 +56,13 @@ const LoginPage = () => {
                 </div>
 
                 <form onSubmit={handleLogin} className="space-y-5">
+                    {error ? (
+                        <p className="text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">{error}</p>
+                    ) : null}
+                    {success ? (
+                        <p className="text-xs text-green-400 bg-green-500/10 border border-green-500/20 rounded-lg px-3 py-2">{success}</p>
+                    ) : null}
+
                     <div className="space-y-4">
                         <div className="space-y-1">
                             <label className="text-xs font-medium text-zinc-400 ml-1">Email address</label>

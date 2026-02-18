@@ -5,8 +5,19 @@ import { ApiError } from "./utils/ApiError.js"
 
 const app=express();
 
+const allowedOrigins = (process.env.CORS_ORIGIN || "http://localhost:5173")
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean)
+
 app.use(cors({
-    origin: process.env.CORS_ORIGIN,
+    origin: (origin, callback) => {
+        if (!origin) return callback(null, true)
+        if (allowedOrigins.includes("*") || allowedOrigins.includes(origin)) {
+            return callback(null, true)
+        }
+        return callback(new ApiError(403, "CORS blocked for this origin"))
+    },
     credentials:true
 }))
 
@@ -22,11 +33,11 @@ import userRouter from './routes/user.route.js'
 app.use("/api/v1/users",userRouter)
 //http://localhost:3000/api/v1/users/register
 
-app.use((_, __, next) => {
+app.use((req, res, next) => {
     next(new ApiError(404, "Route not found"))
 })
 
-app.use((err, _, res, __) => {
+app.use((err, req, res, next) => {
     const statusCode = err.statusCode || 500
     const message = err.message || "Internal Server Error"
 

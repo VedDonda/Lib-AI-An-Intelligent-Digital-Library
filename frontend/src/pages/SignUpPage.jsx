@@ -1,25 +1,58 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mail, Lock, Loader, BookOpen, User, GraduationCap, Library, ArrowLeft } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Input from "../components/Input";
 import PasswordStrengthMeter from "../components/PasswordStrengthMeter";
+import { registerRequest } from "../lib/authApi";
 import "../index.css";
 
 const SignUpPage = () => {
+    const navigate = useNavigate();
     const [role, setRole] = useState(null);
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
 
     const handleSignUp = async (e) => {
         e.preventDefault();
+        setError("");
+        setSuccess("");
+
+        if (!role) {
+            setError("Please select a role first.");
+            return;
+        }
+
+        if (!name.trim() || !email.trim() || !password.trim()) {
+            setError("Please fill name, email and password.");
+            return;
+        }
+
         setIsLoading(true);
-        setTimeout(() => {
+        try {
+            const response = await registerRequest({
+                role,
+                name: name.trim(),
+                email: email.trim(),
+                password,
+            });
+            setSuccess(response?.message || "Registration successful.");
+            setName("");
+            setEmail("");
+            setPassword("");
+
+            setTimeout(() => {
+                navigate("/login");
+            }, 900);
+        } catch (apiError) {
+            setError(apiError.message || "Unable to register user.");
+        } finally {
             setIsLoading(false);
-            console.log("Sign up logic here", { role, name, email });
-        }, 2000);
+        }
     };
 
     return (
@@ -116,6 +149,13 @@ const SignUpPage = () => {
                             </div>
 
                             <form onSubmit={handleSignUp} className="space-y-4">
+                                {error ? (
+                                    <p className="text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">{error}</p>
+                                ) : null}
+                                {success ? (
+                                    <p className="text-xs text-green-400 bg-green-500/10 border border-green-500/20 rounded-lg px-3 py-2">{success}</p>
+                                ) : null}
+
                                 <div className="space-y-3">
                                     <div className="space-y-1">
                                         <label className="text-xs font-medium text-zinc-400 ml-1">Full Name</label>

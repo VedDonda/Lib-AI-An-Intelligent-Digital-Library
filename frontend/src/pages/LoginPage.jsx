@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Mail, Lock, Loader, BookOpen } from "lucide-react";
+import { Mail, Lock, Loader } from "lucide-react";
 import { Link } from "react-router-dom";
 import Input from "../components/Input";
 import { loginRequest } from "../lib/authApi";
 import "../index.css";
+import logo from "../assets/logo.jpeg";
 
 const LoginPage = () => {
     const [email, setEmail] = useState("");
@@ -41,14 +42,11 @@ const LoginPage = () => {
     return (
         <div className="flex h-screen w-full bg-[#050505] text-white overflow-hidden">
             <div className="w-full lg:w-1/2 flex flex-col justify-center px-8 sm:px-12 lg:px-20 xl:px-28 relative z-10">
-                <div className="mb-10">
+                {/* <div className="mb-10">
                     <div className="flex items-center gap-2 mb-2">
-                        <div className="bg-white/10 p-2 rounded-lg">
-                            <BookOpen className="size-5 text-purple-400" />
-                        </div>
-                        <span className="text-lg font-bold tracking-wide">LibAI</span>
+                        <img src={logo} alt="LibAI Logo" className="h-10 w-auto object-contain rounded-lg" />
                     </div>
-                </div>
+                </div> */}
 
                 <div className="mb-8">
                     <h2 className="text-3xl font-bold mb-2 tracking-tight">Welcome Back</h2>
@@ -128,9 +126,9 @@ const LoginPage = () => {
                         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                         className="relative mb-8"
                     >
-                        <div className="absolute inset-0 bg-purple-500 blur-2xl opacity-40 rounded-full"></div>
-                        <div className="relative w-28 h-28 rounded-full bg-gradient-to-br from-purple-400 to-indigo-600 shadow-inner flex items-center justify-center border border-white/20 backdrop-blur-sm">
-                            <BookOpen className="size-14 text-white/90" />
+                        <div className="absolute inset-0 bg-purple-1000 blur-2xl opacity-40 rounded-full"></div>
+                        <div className="relative w-80 h-80 rounded-full overflow-hidden shadow-inner border border-white/20 backdrop-blur-sm">
+                            <img src={logo} alt="LibAI Logo" className="w-full h-full object-cover" />
                         </div>
                     </motion.div>
 
@@ -158,9 +156,8 @@ const LoginPage = () => {
                             transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                         />
                     </div>
-
                 </div>
-            </div>
+            </div>x
         </div>
     );
 };

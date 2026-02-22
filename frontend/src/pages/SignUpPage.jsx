@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Mail, Lock, Loader, BookOpen, User, GraduationCap, Library, ArrowLeft } from "lucide-react";
+import { Mail, Lock, Loader, User, GraduationCap, Library, ArrowLeft } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import Input from "../components/Input";
 import PasswordStrengthMeter from "../components/PasswordStrengthMeter";
 import { registerRequest } from "../lib/authApi";
 import "../index.css";
+import logo from "../assets/logo.jpeg";
 
 const SignUpPage = () => {
     const navigate = useNavigate();
@@ -74,14 +75,11 @@ const SignUpPage = () => {
                     )}
                 </AnimatePresence>
 
-                <div className="mb-6">
+                {/* <div className="mb-6">
                     <div className="flex items-center gap-2 mb-2">
-                        <div className="bg-white/10 p-2 rounded-lg">
-                            <BookOpen className="size-5 text-purple-400" />
-                        </div>
-                        <span className="text-lg font-bold tracking-wide">LibAI</span>
+                        <img src={logo} alt="LibAI Logo" className="h-10 w-auto object-contain rounded-lg" />
                     </div>
-                </div>
+                </div> */}
 
                 <AnimatePresence mode="wait">
                     {!role ? (
@@ -229,8 +227,8 @@ const SignUpPage = () => {
                         className="relative mb-8"
                     >
                         <div className="absolute inset-0 bg-indigo-500 blur-2xl opacity-40 rounded-full"></div>
-                        <div className="relative w-28 h-28 rounded-full bg-gradient-to-br from-indigo-400 to-purple-600 shadow-inner flex items-center justify-center border border-white/20 backdrop-blur-sm">
-                            <BookOpen className="size-14 text-white/90" />
+                        <div className="relative w-28 h-28 rounded-full overflow-hidden shadow-inner border border-white/20 backdrop-blur-sm">
+                            <img src={logo} alt="LibAI Logo" className="w-full h-full object-cover" />
                         </div>
                     </motion.div>
 

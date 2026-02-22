@@ -55,3 +55,33 @@ export const loginRequest = async ({ email, password }) => {
 
   return handleResponse(response);
 };
+
+export const forgotPasswordRequest = async ({ email }) => {
+  const response = await fetch(`${API_BASE_URL}/api/v1/users/forgot-password`, {
+    method: "POST",
+    headers: buildHeaders(),
+    credentials: "include",
+    body: JSON.stringify({ email }),
+  });
+  return handleResponse(response);
+};
+
+export const verifyForgotPasswordOtpRequest = async ({ email, otp }) => {
+  const response = await fetch(`${API_BASE_URL}/api/v1/users/forgot-password/verify-otp`, {
+    method: "POST",
+    headers: buildHeaders(),
+    credentials: "include",
+    body: JSON.stringify({ email, otp }),
+  });
+  return handleResponse(response);
+};
+
+export const resetPasswordRequest = async ({ email, resetToken, newPassword }) => {
+  const response = await fetch(`${API_BASE_URL}/api/v1/users/forgot-password/reset`, {
+    method: "POST",
+    headers: buildHeaders(),
+    credentials: "include",
+    body: JSON.stringify({ email, resetToken, newPassword }),
+  });
+  return handleResponse(response);
+};

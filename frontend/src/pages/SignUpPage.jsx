@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Mail, Lock, Loader, User, GraduationCap, Library, ArrowLeft } from "lucide-react";
+import { Mail, Lock, Loader, User, GraduationCap, Library, ArrowLeft, ShieldCheck, Eye, EyeOff } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import Input from "../components/Input";
 import PasswordStrengthMeter from "../components/PasswordStrengthMeter";
@@ -14,6 +14,9 @@ const SignUpPage = () => {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
@@ -30,6 +33,11 @@ const SignUpPage = () => {
 
         if (!name.trim() || !email.trim() || !password.trim()) {
             setError("Please fill name, email and password.");
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            setError("Passwords do not match.");
             return;
         }
 
@@ -121,6 +129,19 @@ const SignUpPage = () => {
                                         <p className="text-xs text-zinc-500">Manage and organize the library</p>
                                     </div>
                                 </button>
+
+                                <button
+                                    onClick={() => setRole("admin")}
+                                    className="w-full p-4 rounded-xl bg-zinc-900/50 border border-zinc-800 hover:border-rose-500/50 hover:bg-zinc-800/50 transition-all group flex items-center gap-4 text-left"
+                                >
+                                    <div className="p-3 bg-rose-500/10 rounded-lg group-hover:bg-rose-500/20 transition-colors">
+                                        <ShieldCheck className="size-6 text-rose-400" />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-semibold text-lg">Admin</h3>
+                                        <p className="text-xs text-zinc-500">Full system access and control</p>
+                                    </div>
+                                </button>
                             </div>
 
                             <div className="mt-8 text-center">
@@ -141,7 +162,7 @@ const SignUpPage = () => {
                         >
                             <div className="mb-6 relative">
                                 <h2 className="text-3xl font-bold mb-2 tracking-tight">
-                                    {role === "student" ? "Student" : "Librarian"} Account
+                                    {role === "student" ? "Student" : role === "librarian" ? "Librarian" : "Admin"} Account
                                 </h2>
                                 <p className="text-zinc-500 text-sm">Create your account to continue.</p>
                             </div>
@@ -181,10 +202,41 @@ const SignUpPage = () => {
                                         <label className="text-xs font-medium text-zinc-400 ml-1">Password</label>
                                         <Input
                                             icon={Lock}
-                                            type="password"
+                                            type={showPassword ? "text" : "password"}
                                             placeholder="Create a password"
                                             value={password}
                                             onChange={(e) => setPassword(e.target.value)}
+                                            rightElement={
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setShowPassword((v) => !v)}
+                                                    className="text-zinc-500 hover:text-zinc-300 transition-colors focus:outline-none"
+                                                    tabIndex={-1}
+                                                >
+                                                    {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                                                </button>
+                                            }
+                                        />
+                                    </div>
+
+                                    <div className="space-y-1">
+                                        <label className="text-xs font-medium text-zinc-400 ml-1">Confirm Password</label>
+                                        <Input
+                                            icon={Lock}
+                                            type={showConfirmPassword ? "text" : "password"}
+                                            placeholder="Re-enter your password"
+                                            value={confirmPassword}
+                                            onChange={(e) => setConfirmPassword(e.target.value)}
+                                            rightElement={
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setShowConfirmPassword((v) => !v)}
+                                                    className="text-zinc-500 hover:text-zinc-300 transition-colors focus:outline-none"
+                                                    tabIndex={-1}
+                                                >
+                                                    {showConfirmPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                                                </button>
+                                            }
                                         />
                                     </div>
                                 </div>
@@ -226,8 +278,8 @@ const SignUpPage = () => {
                         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                         className="relative mb-8"
                     >
-                        <div className="absolute inset-0 bg-indigo-500 blur-2xl opacity-40 rounded-full"></div>
-                        <div className="relative w-28 h-28 rounded-full overflow-hidden shadow-inner border border-white/20 backdrop-blur-sm">
+                        <div className="absolute inset-0 bg-purple-900 blur-2xl opacity-40 rounded-full"></div>
+                        <div className="relative w-80 h-80 rounded-full overflow-hidden shadow-inner border border-white/20 backdrop-blur-sm">
                             <img src={logo} alt="LibAI Logo" className="w-full h-full object-cover" />
                         </div>
                     </motion.div>

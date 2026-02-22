@@ -2,16 +2,35 @@ import { Route, Routes } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
 import VerifyOtpPage from "./pages/VerifyOtpPage";
+import DashboardPage from "./pages/DashboardPage";
+import BookReaderPage from "./pages/BookReaderPage";
+import AddBookPage from "./pages/AddBookPage";
+import ProtectedRoute from "./components/ProtectedRoute";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 
 function App() {
   return (
     <div className="min-h-screen bg-black">
       <Routes>
-        <Route path="/" element={<LoginPage />} />
-        <Route path="/signup" element={<SignUpPage />} />
+        {/* Auth routes */}
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignUpPage />} />
         <Route path="/verify-otp" element={<VerifyOtpPage />} />
+
+        {/* Public — anyone can browse and read */}
+        <Route path="/" element={<DashboardPage />} />
+        <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/books/:id" element={<BookReaderPage />} />
+
+        {/* Librarian only */}
+        <Route
+          path="/add-book"
+          element={
+            <ProtectedRoute requiredRole="librarian">
+              <AddBookPage />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       </Routes>
     </div>

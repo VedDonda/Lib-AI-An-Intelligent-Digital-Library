@@ -13,7 +13,7 @@ const handleResponse = async (response) => {
 };
 
 export const registerRequest = async ({ name, email, password, role }) => {
-  const response = await fetch(`${API_BASE_URL}/api/v1/users/register`, {
+  const response = await fetch(`${API_BASE_URL}/users/register`, {
     method: "POST",
     headers: buildHeaders(),
     credentials: "include",
@@ -24,7 +24,7 @@ export const registerRequest = async ({ name, email, password, role }) => {
 };
 
 export const verifyOtpRequest = async ({ email, otp }) => {
-  const response = await fetch(`${API_BASE_URL}/api/v1/users/verify-otp`, {
+  const response = await fetch(`${API_BASE_URL}/users/verify-otp`, {
     method: "POST",
     headers: buildHeaders(),
     credentials: "include",
@@ -35,7 +35,7 @@ export const verifyOtpRequest = async ({ email, otp }) => {
 };
 
 export const resendOtpRequest = async ({ email }) => {
-  const response = await fetch(`${API_BASE_URL}/api/v1/users/resend-otp`, {
+  const response = await fetch(`${API_BASE_URL}/users/resend-otp`, {
     method: "POST",
     headers: buildHeaders(),
     credentials: "include",
@@ -46,7 +46,7 @@ export const resendOtpRequest = async ({ email }) => {
 };
 
 export const loginRequest = async ({ email, password }) => {
-  const response = await fetch(`${API_BASE_URL}/api/v1/users/login`, {
+  const response = await fetch(`${API_BASE_URL}/users/login`, {
     method: "POST",
     headers: buildHeaders(),
     credentials: "include",

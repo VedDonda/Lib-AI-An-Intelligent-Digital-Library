@@ -3,7 +3,7 @@ import cors from "cors"
 import cookieParser from "cookie-parser"
 import { ApiError } from "./utils/ApiError.js"
 
-const app=express();
+const app = express();
 
 const allowedOrigins = (process.env.CORS_ORIGIN || "http://localhost:5173")
     .split(",")
@@ -18,20 +18,21 @@ app.use(cors({
         }
         return callback(new ApiError(403, "CORS blocked for this origin"))
     },
-    credentials:true
+    credentials: true
 }))
 
-app.use(express.json({limit:"16kb"}))
-app.use(express.urlencoded({extended:true , limit:"16kb"}))
+app.use(express.json({ limit: "16kb" }))
+app.use(express.urlencoded({ extended: true, limit: "16kb" }))
 app.use(express.static("public"))
 app.use(cookieParser())
 
 //routes import
 import userRouter from './routes/user.route.js'
+import bookRouter from './routes/book.route.js'
 
 //routes declaration
-app.use("/api/v1/users",userRouter)
-//http://localhost:3000/api/v1/users/register
+app.use("/users", userRouter)
+app.use("/books", bookRouter)
 
 app.use((req, res, next) => {
     next(new ApiError(404, "Route not found"))
@@ -48,4 +49,4 @@ app.use((err, req, res, next) => {
     })
 })
 
-export {app};
+export { app };

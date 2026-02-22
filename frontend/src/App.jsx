@@ -6,6 +6,7 @@ import DashboardPage from "./pages/DashboardPage";
 import BookReaderPage from "./pages/BookReaderPage";
 import AddBookPage from "./pages/AddBookPage";
 import ProtectedRoute from "./components/ProtectedRoute";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       </Routes>
     </div>
   );

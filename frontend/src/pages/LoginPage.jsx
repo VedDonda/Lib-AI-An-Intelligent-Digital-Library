@@ -1,13 +1,16 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Mail, Lock, Loader } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Input from "../components/Input";
 import { loginRequest } from "../lib/authApi";
+import { useAuth } from "../context/AuthContext";
 import "../index.css";
 import logo from "../assets/logo.jpeg";
 
 const LoginPage = () => {
+    const navigate = useNavigate();
+    const { login } = useAuth();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [isLoading, setIsLoading] = useState(false);
@@ -30,8 +33,10 @@ const LoginPage = () => {
                 email: email.trim(),
                 password,
             });
-            const loggedInName = response?.data?.user?.name || "User";
-            setSuccess(`${loggedInName} logged in successfully.`);
+            const { user, accessToken } = response?.data || {};
+            login(accessToken, user);
+            setSuccess(`Welcome back, ${user?.name || "User"}!`);
+            setTimeout(() => navigate("/dashboard"), 800);
         } catch (apiError) {
             setError(apiError.message || "Unable to login.");
         } finally {

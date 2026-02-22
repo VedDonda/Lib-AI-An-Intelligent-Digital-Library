@@ -23,6 +23,28 @@ export const registerRequest = async ({ name, email, password, role }) => {
   return handleResponse(response);
 };
 
+export const verifyOtpRequest = async ({ email, otp }) => {
+  const response = await fetch(`${API_BASE_URL}/api/v1/users/verify-otp`, {
+    method: "POST",
+    headers: buildHeaders(),
+    credentials: "include",
+    body: JSON.stringify({ email, otp }),
+  });
+
+  return handleResponse(response);
+};
+
+export const resendOtpRequest = async ({ email }) => {
+  const response = await fetch(`${API_BASE_URL}/api/v1/users/resend-otp`, {
+    method: "POST",
+    headers: buildHeaders(),
+    credentials: "include",
+    body: JSON.stringify({ email }),
+  });
+
+  return handleResponse(response);
+};
+
 export const loginRequest = async ({ email, password }) => {
   const response = await fetch(`${API_BASE_URL}/api/v1/users/login`, {
     method: "POST",

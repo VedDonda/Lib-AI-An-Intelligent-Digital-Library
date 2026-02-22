@@ -40,13 +40,13 @@ const SignUpPage = () => {
                 email: email.trim(),
                 password,
             });
-            setSuccess(response?.message || "Registration successful.");
+            setSuccess(response?.message || "OTP sent! Redirecting to verification...");
             setName("");
             setEmail("");
             setPassword("");
 
             setTimeout(() => {
-                navigate("/login");
+                navigate(`/verify-otp?email=${encodeURIComponent(email.trim())}`);
             }, 900);
         } catch (apiError) {
             setError(apiError.message || "Unable to register user.");

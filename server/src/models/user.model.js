@@ -28,6 +28,10 @@ const userSchema = new mongoose.Schema(
       enum: ["student", "librarian"],
       default: "student",
     },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

@@ -6,6 +6,9 @@ import {
   registerUser,
   verifyOtp,
   resendOtp,
+  sendForgotPasswordOtp,
+  verifyForgotPasswordOtp,
+  resetPassword,
 } from "../controllers/auth.controller.js";
 import { authorizeRoles, verifyJWT } from "../middlewares/auth.middleware.js";
 
@@ -17,5 +20,10 @@ router.post("/resend-otp", resendOtp);
 router.post("/login", loginUser);
 router.get("/me", verifyJWT, getCurrentUser);
 router.get("/librarian", verifyJWT, authorizeRoles("librarian"), librarianDashboard);
+
+// Forgot password flow
+router.post("/forgot-password", sendForgotPasswordOtp);
+router.post("/forgot-password/verify-otp", verifyForgotPasswordOtp);
+router.post("/forgot-password/reset", resetPassword);
 
 export default router;

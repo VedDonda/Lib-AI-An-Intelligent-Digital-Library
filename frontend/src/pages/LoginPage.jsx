@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Mail, Lock, Loader } from "lucide-react";
+import { Mail, Lock, Loader, Eye, EyeOff } from "lucide-react";
 import { Link } from "react-router-dom";
 import Input from "../components/Input";
 import { loginRequest } from "../lib/authApi";
@@ -13,6 +13,7 @@ const LoginPage = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -70,18 +71,28 @@ const LoginPage = () => {
                                 placeholder="Enter your email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                            />
+                                />
                         </div>
 
                         <div className="space-y-1">
                             <label className="text-xs font-medium text-zinc-400 ml-1">Password</label>
                             <Input
                                 icon={Lock}
-                                type="password"
+                                type={showPassword ? "text" : "password"}
                                 placeholder="Enter your password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                            />
+                                rightElement={
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword((v) => !v)}
+                                        className="text-zinc-500 hover:text-zinc-300 transition-colors focus:outline-none"
+                                        tabIndex={-1}
+                                    >
+                                        {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                                    </button>
+                                }
+                                />
                         </div>
                     </div>
 
@@ -116,8 +127,8 @@ const LoginPage = () => {
             </div>
 
             <div className="hidden lg:flex w-1/2 relative bg-[#0a0a0a] m-3 rounded-[2rem] overflow-hidden border border-zinc-800/50 shadow-2xl">
-                <div className="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] bg-purple-600/20 rounded-full blur-[120px]"></div>
-                <div className="absolute bottom-[-10%] left-[-10%] w-[400px] h-[400px] bg-blue-600/10 rounded-full blur-[100px]"></div>
+                <div className="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] bg-indigo-600/20 rounded-full blur-[120px]"></div>
+                <div className="absolute bottom-[-10%] left-[-10%] w-[400px] h-[400px] bg-purple-600/10 rounded-full blur-[100px]"></div>
 
                 <div className="relative z-10 flex flex-col items-center justify-center w-full h-full p-12 text-center">
 
@@ -126,7 +137,7 @@ const LoginPage = () => {
                         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                         className="relative mb-8"
                     >
-                        <div className="absolute inset-0 bg-purple-1000 blur-2xl opacity-40 rounded-full"></div>
+                        <div className="absolute inset-0 bg-purple-900 blur-2xl opacity-40 rounded-full"></div>
                         <div className="relative w-80 h-80 rounded-full overflow-hidden shadow-inner border border-white/20 backdrop-blur-sm">
                             <img src={logo} alt="LibAI Logo" className="w-full h-full object-cover" />
                         </div>
@@ -156,8 +167,9 @@ const LoginPage = () => {
                             transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                         />
                     </div>
+
                 </div>
-            </div>x
+            </div>
         </div>
     );
 };

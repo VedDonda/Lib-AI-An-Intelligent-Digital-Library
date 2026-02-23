@@ -56,6 +56,18 @@ export const loginRequest = async ({ email, password }) => {
   return handleResponse(response);
 };
 
+export const logoutRequest = async (token) => {
+  const response = await fetch(`${API_BASE_URL}/users/logout`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return handleResponse(response);
+};
+
 export const forgotPasswordRequest = async ({ email }) => {
   const response = await fetch(`${API_BASE_URL}/api/v1/users/forgot-password`, {
     method: "POST",

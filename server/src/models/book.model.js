@@ -22,12 +22,8 @@ const bookSchema = new mongoose.Schema(
             default: "",
         },
         pdfUrl: {
-            type: String, // Cloudinary URL (raw)
+            type: String, // Cloudinary URL
             required: true,
-        },
-        pdfPublicId: {
-            type: String, // Cloudinary public_id for signed URL generation
-            default: "",
         },
         uploadedBy: {
             type: mongoose.Schema.Types.ObjectId,

@@ -2,7 +2,7 @@ import { Book } from "../models/book.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { uploadOnCloudinary, getSignedUrl } from "../utils/cloudinary.js";
+import { uploadOnCloudinary, deleteFromCloudinary } from "../utils/cloudinary.js";
 
 // ─── Get all books (public) ─────────────────────────────────────────
 const getAllBooks = asyncHandler(async (req, res) => {
@@ -25,15 +25,9 @@ const getBookById = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Book not found");
     }
 
-    // Generate a signed URL for the PDF so it bypasses Cloudinary 401
-    const bookData = book.toObject();
-    if (bookData.pdfPublicId) {
-        bookData.pdfUrl = getSignedUrl(bookData.pdfPublicId, "raw");
-    }
-
     return res
         .status(200)
-        .json(new ApiResponse(200, bookData, "Book fetched successfully"));
+        .json(new ApiResponse(200, book, "Book fetched successfully"));
 });
 
 // ─── Upload book (librarian only) ───────────────────────────────────
@@ -75,7 +69,6 @@ const addBook = asyncHandler(async (req, res) => {
         description: description?.trim() || "",
         coverImage: coverImageUrl,
         pdfUrl: pdfUpload.secure_url,
-        pdfPublicId: pdfUpload.public_id,
         uploadedBy: req.user._id,
     });
 
@@ -92,6 +85,16 @@ const deleteBook = asyncHandler(async (req, res) => {
 
     if (!book) {
         throw new ApiError(404, "Book not found");
+    }
+
+    // Delete PDF from Cloudinary (resource_type: "raw" for PDFs)
+    if (book.pdfUrl) {
+        await deleteFromCloudinary(book.pdfUrl, "raw");
+    }
+
+    // Delete cover image from Cloudinary (resource_type: "image")
+    if (book.coverImage) {
+        await deleteFromCloudinary(book.coverImage, "image");
     }
 
     await Book.findByIdAndDelete(req.params.id);

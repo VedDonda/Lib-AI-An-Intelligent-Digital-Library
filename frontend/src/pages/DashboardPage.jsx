@@ -1,15 +1,20 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Search, BookOpen, Loader, User } from "lucide-react";
+import { Search, BookOpen, Loader, User, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { getAllBooks } from "../lib/bookApi";
+import { getAllBooks, deleteBook } from "../lib/bookApi";
+import { useAuth } from "../context/AuthContext";
 import Navbar from "../components/Navbar";
 
 const DashboardPage = () => {
+    const { user, token } = useAuth();
     const [books, setBooks] = useState([]);
     const [search, setSearch] = useState("");
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
+    const [deletingId, setDeletingId] = useState(null);
+
+    const isLibrarian = user?.role === "librarian";
 
     useEffect(() => {
         const fetchBooks = async () => {
@@ -24,6 +29,25 @@ const DashboardPage = () => {
         };
         fetchBooks();
     }, []);
+
+    const handleDelete = async (e, bookId, bookTitle) => {
+        e.preventDefault(); // prevent Link navigation
+        e.stopPropagation();
+
+        if (!window.confirm(`Are you sure you want to delete "${bookTitle}"? This will remove it from Cloudinary and the database.`)) {
+            return;
+        }
+
+        try {
+            setDeletingId(bookId);
+            await deleteBook(bookId, token);
+            setBooks((prev) => prev.filter((b) => b._id !== bookId));
+        } catch (err) {
+            alert(err.message || "Failed to delete book");
+        } finally {
+            setDeletingId(null);
+        }
+    };
 
     const filteredBooks = books.filter(
         (book) =>
@@ -91,7 +115,7 @@ const DashboardPage = () => {
                             >
                                 <Link
                                     to={`/books/${book._id}`}
-                                    className="group block bg-zinc-900/40 border border-zinc-800/60 rounded-2xl overflow-hidden hover:border-purple-500/30 hover:shadow-lg hover:shadow-purple-900/10 transition-all duration-300"
+                                    className="group block bg-zinc-900/40 border border-zinc-800/60 rounded-2xl overflow-hidden hover:border-purple-500/30 hover:shadow-lg hover:shadow-purple-900/10 transition-all duration-300 relative"
                                 >
                                     {/* Cover */}
                                     <div className="aspect-[3/4] bg-zinc-800 overflow-hidden relative">
@@ -123,6 +147,22 @@ const DashboardPage = () => {
                                             <span className="line-clamp-1">{book.author}</span>
                                         </div>
                                     </div>
+
+                                    {/* Delete button — librarian only */}
+                                    {isLibrarian && (
+                                        <button
+                                            onClick={(e) => handleDelete(e, book._id, book.title)}
+                                            disabled={deletingId === book._id}
+                                            className="absolute top-2 right-2 z-10 p-2 bg-red-500/80 hover:bg-red-600 rounded-lg text-white opacity-0 group-hover:opacity-100 transition-all duration-200 backdrop-blur-sm disabled:opacity-50 cursor-pointer"
+                                            title="Delete book"
+                                        >
+                                            {deletingId === book._id ? (
+                                                <Loader className="size-4 animate-spin" />
+                                            ) : (
+                                                <Trash2 className="size-4" />
+                                            )}
+                                        </button>
+                                    )}
                                 </Link>
                             </motion.div>
                         ))}
@@ -134,3 +174,4 @@ const DashboardPage = () => {
 };
 
 export default DashboardPage;
+

@@ -228,6 +228,14 @@ const loginUser = asyncHandler(async (req, res) => {
     );
 });
 
+// ─── Logout ─────────────────────────────────────────────────────────
+const logoutUser = asyncHandler(async (req, res) => {
+  return res
+    .status(200)
+    .clearCookie("accessToken", cookieOptions)
+    .json(new ApiResponse(200, {}, "User logged out successfully"));
+});
+
 // ─── Other handlers ─────────────────────────────────────────────────
 const getCurrentUser = asyncHandler(async (req, res) => {
   return res
@@ -361,5 +369,5 @@ const resetPassword = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, {}, "Password reset successfully"));
 });
 
-export { registerUser, verifyOtp, resendOtp, loginUser, getCurrentUser, librarianDashboard, sendForgotPasswordOtp, verifyForgotPasswordOtp, resetPassword };
+export { registerUser, verifyOtp, resendOtp, loginUser, logoutUser, getCurrentUser, librarianDashboard, sendForgotPasswordOtp, verifyForgotPasswordOtp, resetPassword };
 

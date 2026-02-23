@@ -3,6 +3,7 @@ import {
   getCurrentUser,
   librarianDashboard,
   loginUser,
+  logoutUser,
   registerUser,
   verifyOtp,
   resendOtp,
@@ -18,6 +19,7 @@ router.post("/register", registerUser);
 router.post("/verify-otp", verifyOtp);
 router.post("/resend-otp", resendOtp);
 router.post("/login", loginUser);
+router.post("/logout", verifyJWT, logoutUser);
 router.get("/me", verifyJWT, getCurrentUser);
 router.get("/librarian", verifyJWT, authorizeRoles("librarian"), librarianDashboard);
 

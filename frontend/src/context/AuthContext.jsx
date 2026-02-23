@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
+import { logoutRequest } from "../lib/authApi";
 
 const AuthContext = createContext(null);
 
@@ -8,7 +9,6 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Restore from localStorage on mount
         const savedToken = localStorage.getItem("accessToken");
         const savedUser = localStorage.getItem("user");
         if (savedToken && savedUser) {
@@ -25,7 +25,8 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem("user", JSON.stringify(userData));
     };
 
-    const logout = () => {
+    const logout = async () => {
+        try { await logoutRequest(token); } catch (_) { }
         setToken(null);
         setUser(null);
         localStorage.removeItem("accessToken");

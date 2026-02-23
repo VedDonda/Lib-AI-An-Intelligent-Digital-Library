@@ -26,13 +26,13 @@ app.use(express.urlencoded({ extended: true, limit: "16kb" }))
 app.use(express.static("public"))
 app.use(cookieParser())
 
-//routes import
 import userRouter from './routes/user.route.js'
 import bookRouter from './routes/book.route.js'
+import adminRouter from './routes/admin.route.js'
 
-//routes declaration
 app.use("/users", userRouter)
 app.use("/books", bookRouter)
+app.use("/admin", adminRouter)
 
 app.use((req, res, next) => {
     next(new ApiError(404, "Route not found"))

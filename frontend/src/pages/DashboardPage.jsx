@@ -14,6 +14,7 @@ const DashboardPage = () => {
     const [error, setError] = useState("");
     const [deletingId, setDeletingId] = useState(null);
 
+    const isAdmin = user?.role === "admin";
     const isLibrarian = user?.role === "librarian";
 
     useEffect(() => {
@@ -60,13 +61,11 @@ const DashboardPage = () => {
             <Navbar />
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                {/* Header */}
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold tracking-tight mb-2">Digital Library</h1>
                     <p className="text-zinc-500 text-sm">Browse and read books from your college library — anytime, anywhere.</p>
                 </div>
 
-                {/* Search */}
                 <div className="relative mb-8 max-w-md">
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-zinc-500" />
                     <input
@@ -78,19 +77,16 @@ const DashboardPage = () => {
                     />
                 </div>
 
-                {/* Loading */}
                 {isLoading && (
                     <div className="flex items-center justify-center py-32">
                         <Loader className="size-8 text-purple-400 animate-spin" />
                     </div>
                 )}
 
-                {/* Error */}
                 {error && (
                     <p className="text-center text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 max-w-md mx-auto">{error}</p>
                 )}
 
-                {/* Empty State */}
                 {!isLoading && !error && filteredBooks.length === 0 && (
                     <div className="text-center py-32">
                         <BookOpen className="size-16 text-zinc-700 mx-auto mb-4" />
@@ -103,7 +99,6 @@ const DashboardPage = () => {
                     </div>
                 )}
 
-                {/* Book Grid */}
                 {!isLoading && !error && filteredBooks.length > 0 && (
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
                         {filteredBooks.map((book, index) => (
@@ -117,7 +112,6 @@ const DashboardPage = () => {
                                     to={`/books/${book._id}`}
                                     className="group block bg-zinc-900/40 border border-zinc-800/60 rounded-2xl overflow-hidden hover:border-purple-500/30 hover:shadow-lg hover:shadow-purple-900/10 transition-all duration-300 relative"
                                 >
-                                    {/* Cover */}
                                     <div className="aspect-[3/4] bg-zinc-800 overflow-hidden relative">
                                         {book.coverImage ? (
                                             <img
@@ -131,13 +125,11 @@ const DashboardPage = () => {
                                                 <span className="text-xs text-zinc-600">No Cover</span>
                                             </div>
                                         )}
-                                        {/* Hover overlay */}
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
                                             <span className="text-sm font-medium text-purple-300">Read Book →</span>
                                         </div>
                                     </div>
 
-                                    {/* Info */}
                                     <div className="p-4">
                                         <h3 className="text-sm font-semibold text-white leading-snug line-clamp-2 mb-1.5 group-hover:text-purple-300 transition-colors">
                                             {book.title}
@@ -148,8 +140,7 @@ const DashboardPage = () => {
                                         </div>
                                     </div>
 
-                                    {/* Delete button — librarian only */}
-                                    {isLibrarian && (
+                                    {(isAdmin || (isLibrarian && book.uploadedBy?._id === user?._id)) && (
                                         <button
                                             onClick={(e) => handleDelete(e, book._id, book.title)}
                                             disabled={deletingId === book._id}

@@ -7,6 +7,7 @@ import BookReaderPage from "./pages/BookReaderPage";
 import AddBookPage from "./pages/AddBookPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import AdminDashboardPage from "./pages/AdminDashboardPage";
 
 function App() {
   return (
@@ -26,12 +27,22 @@ function App() {
         <Route
           path="/add-book"
           element={
-            <ProtectedRoute requiredRole="librarian">
+            <ProtectedRoute requiredRole={["librarian", "admin"]}>
               <AddBookPage />
             </ProtectedRoute>
           }
         />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+
+        {/* Admin only */}
+        <Route
+          path="/admin-dashboard"
+          element={
+            <ProtectedRoute requiredRole="admin">
+              <AdminDashboardPage />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </div>
   );

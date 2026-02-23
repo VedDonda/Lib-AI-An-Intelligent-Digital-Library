@@ -1,10 +1,6 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
-/**
- * ProtectedRoute — wraps pages that require authentication or a specific role.
- * @param {{ children: ReactNode, requiredRole?: string }} props
- */
 const ProtectedRoute = ({ children, requiredRole }) => {
     const { user, loading } = useAuth();
 
@@ -20,8 +16,11 @@ const ProtectedRoute = ({ children, requiredRole }) => {
         return <Navigate to="/login" replace />;
     }
 
-    if (requiredRole && user.role !== requiredRole) {
-        return <Navigate to="/dashboard" replace />;
+    if (requiredRole) {
+        const roles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
+        if (!roles.includes(user.role)) {
+            return <Navigate to="/dashboard" replace />;
+        }
     }
 
     return children;

@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { uploadBook } from "../lib/bookApi";
 import Navbar from "../components/Navbar";
+import BackButton from "../components/BackButton";
 
 const AddBookPage = () => {
     const { token } = useAuth();
@@ -71,6 +72,7 @@ const AddBookPage = () => {
             <Navbar />
 
             <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8">
+                <BackButton className="!static mb-6" onClick={() => navigate(-1)} />
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold tracking-tight mb-2">Add New Book</h1>
                     <p className="text-zinc-500 text-sm">Upload a book to the digital library for students to access.</p>
@@ -91,7 +93,6 @@ const AddBookPage = () => {
                         </motion.div>
                     )}
 
-                    {/* Title */}
                     <div className="space-y-1">
                         <label className="text-xs font-medium text-zinc-400 ml-1">Book Title *</label>
                         <input
@@ -103,7 +104,6 @@ const AddBookPage = () => {
                         />
                     </div>
 
-                    {/* Author */}
                     <div className="space-y-1">
                         <label className="text-xs font-medium text-zinc-400 ml-1">Author *</label>
                         <input
@@ -115,7 +115,6 @@ const AddBookPage = () => {
                         />
                     </div>
 
-                    {/* Description */}
                     <div className="space-y-1">
                         <label className="text-xs font-medium text-zinc-400 ml-1">Description</label>
                         <textarea
@@ -127,9 +126,7 @@ const AddBookPage = () => {
                         />
                     </div>
 
-                    {/* File Uploads */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {/* PDF */}
                         <div
                             onClick={() => pdfInputRef.current?.click()}
                             className="cursor-pointer border-2 border-dashed border-zinc-700 hover:border-purple-500/40 rounded-2xl p-6 text-center transition-colors group"
@@ -158,7 +155,6 @@ const AddBookPage = () => {
                             </div>
                         </div>
 
-                        {/* Cover Image */}
                         <div
                             onClick={() => coverInputRef.current?.click()}
                             className="cursor-pointer border-2 border-dashed border-zinc-700 hover:border-purple-500/40 rounded-2xl p-6 text-center transition-colors group overflow-hidden"
@@ -184,7 +180,6 @@ const AddBookPage = () => {
                         </div>
                     </div>
 
-                    {/* Submit */}
                     <motion.button
                         whileHover={{ scale: 1.01 }}
                         whileTap={{ scale: 0.99 }}

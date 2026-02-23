@@ -87,6 +87,10 @@ const deleteBook = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Book not found");
     }
 
+    if (req.user.role !== "admin" && book.uploadedBy.toString() !== req.user._id.toString()) {
+        throw new ApiError(403, "You do not have permission to delete this book");
+    }
+
     // Delete PDF from Cloudinary (resource_type: "raw" for PDFs)
     if (book.pdfUrl) {
         await deleteFromCloudinary(book.pdfUrl, "raw");

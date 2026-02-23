@@ -4,6 +4,7 @@ import { Mail, Lock, Loader, User, GraduationCap, Library, ArrowLeft, ShieldChec
 import { Link, useNavigate } from "react-router-dom";
 import Input from "../components/Input";
 import PasswordStrengthMeter from "../components/PasswordStrengthMeter";
+import BackButton from "../components/BackButton";
 import { registerRequest } from "../lib/authApi";
 import "../index.css";
 import logo from "../assets/logo.jpeg";
@@ -70,16 +71,7 @@ const SignUpPage = () => {
 
                 <AnimatePresence>
                     {role && (
-                        <motion.button
-                            initial={{ opacity: 0, x: -10 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: -10 }}
-                            onClick={() => setRole(null)}
-                            className="absolute top-8 left-8 z-50 p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-full transition-colors"
-                            title="Back to role selection"
-                        >
-                            <ArrowLeft className="size-5" />
-                        </motion.button>
+                        <BackButton onClick={() => setRole(null)} title="Back to role selection" />
                     )}
                 </AnimatePresence>
 
@@ -130,7 +122,7 @@ const SignUpPage = () => {
                                     </div>
                                 </button>
 
-                                <button
+                                {/* <button
                                     onClick={() => setRole("admin")}
                                     className="w-full p-4 rounded-xl bg-zinc-900/50 border border-zinc-800 hover:border-rose-500/50 hover:bg-zinc-800/50 transition-all group flex items-center gap-4 text-left"
                                 >
@@ -141,7 +133,7 @@ const SignUpPage = () => {
                                         <h3 className="font-semibold text-lg">Admin</h3>
                                         <p className="text-xs text-zinc-500">Full system access and control</p>
                                     </div>
-                                </button>
+                                </button> */}
                             </div>
 
                             <div className="mt-8 text-center">
@@ -162,7 +154,7 @@ const SignUpPage = () => {
                         >
                             <div className="mb-6 relative">
                                 <h2 className="text-3xl font-bold mb-2 tracking-tight">
-                                    {role === "student" ? "Student" : role === "librarian" ? "Librarian" : "Admin"} Account
+                                    {role === "student" ? "Student" : "Librarian"} Account
                                 </h2>
                                 <p className="text-zinc-500 text-sm">Create your account to continue.</p>
                             </div>
@@ -279,7 +271,7 @@ const SignUpPage = () => {
                         className="relative mb-8"
                     >
                         <div className="absolute inset-0 bg-purple-900 blur-2xl opacity-40 rounded-full"></div>
-                        <div className="relative w-80 h-80 rounded-full overflow-hidden shadow-inner border border-white/20 backdrop-blur-sm">
+                        <div className="relative w-80 h-80 rounded-full overflow-hidden shadow-inner border border-purple-200/20 backdrop-blur-sm">
                             <img src={logo} alt="LibAI Logo" className="w-full h-full object-cover" />
                         </div>
                     </motion.div>

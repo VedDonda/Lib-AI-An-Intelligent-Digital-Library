@@ -25,18 +25,30 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["student", "librarian","admin"],
+      enum: ["student", "librarian", "admin"],
       default: "student",
     },
     isVerified: {
       type: Boolean,
       default: false,
     },
+    isApproved: {
+      type: Boolean,
+      default: true,
+    }
   },
   { timestamps: true }
 );
 
 userSchema.pre("save", async function (next) {
+  if (this.isNew) {
+    if (this.role === "librarian") {
+      this.isApproved = false;
+    } else {
+      this.isApproved = true;
+    }
+  }
+
   if (!this.isModified("password")) return next();
   this.password = await bcrypt.hash(this.password, 10);
   next();

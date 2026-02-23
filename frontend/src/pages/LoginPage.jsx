@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Mail, Lock, Loader, Eye, EyeOff } from "lucide-react";
-import { Link, useNavigate} from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Input from "../components/Input";
+import BackButton from "../components/BackButton";
 import { loginRequest } from "../lib/authApi";
 import { useAuth } from "../context/AuthContext";
 import "../index.css";
@@ -54,6 +55,8 @@ const LoginPage = () => {
                     </div>
                 </div> */}
 
+                <BackButton onClick={() => navigate("/")} />
+
                 <div className="mb-8">
                     <h2 className="text-3xl font-bold mb-2 tracking-tight">Welcome Back</h2>
                     <p className="text-zinc-500 text-sm">Enter your email and password to access your library.</p>
@@ -76,7 +79,7 @@ const LoginPage = () => {
                                 placeholder="Enter your email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                />
+                            />
                         </div>
 
                         <div className="space-y-1">
@@ -97,7 +100,7 @@ const LoginPage = () => {
                                         {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                                     </button>
                                 }
-                                />
+                            />
                         </div>
                     </div>
 
@@ -143,7 +146,7 @@ const LoginPage = () => {
                         className="relative mb-8"
                     >
                         <div className="absolute inset-0 bg-purple-900 blur-2xl opacity-40 rounded-full"></div>
-                        <div className="relative w-80 h-80 rounded-full overflow-hidden shadow-inner border border-white/20 backdrop-blur-sm">
+                        <div className="relative w-80 h-80 rounded-full overflow-hidden shadow-inner border border-purple-200/20 backdrop-blur-sm">
                             <img src={logo} alt="LibAI Logo" className="w-full h-full object-cover" />
                         </div>
                     </motion.div>

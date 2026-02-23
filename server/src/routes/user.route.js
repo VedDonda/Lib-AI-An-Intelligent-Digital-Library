@@ -23,7 +23,6 @@ router.post("/logout", verifyJWT, logoutUser);
 router.get("/me", verifyJWT, getCurrentUser);
 router.get("/librarian", verifyJWT, authorizeRoles("librarian"), librarianDashboard);
 
-// Forgot password flow
 router.post("/forgot-password", sendForgotPasswordOtp);
 router.post("/forgot-password/verify-otp", verifyForgotPasswordOtp);
 router.post("/forgot-password/reset", resetPassword);

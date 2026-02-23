@@ -10,15 +10,13 @@ import { upload } from "../middlewares/multer.middleware.js";
 
 const router = Router();
 
-// Public routes — anyone can view books (no login required)
 router.get("/", getAllBooks);
 router.get("/:id", getBookById);
 
-// Librarian-only routes
 router.post(
     "/",
     verifyJWT,
-    authorizeRoles("librarian"),
+    authorizeRoles("librarian", "admin"),
     upload.fields([
         { name: "coverImage", maxCount: 1 },
         { name: "pdfFile", maxCount: 1 },
@@ -29,7 +27,7 @@ router.post(
 router.delete(
     "/:id",
     verifyJWT,
-    authorizeRoles("librarian"),
+    authorizeRoles("librarian", "admin"),
     deleteBook
 );
 

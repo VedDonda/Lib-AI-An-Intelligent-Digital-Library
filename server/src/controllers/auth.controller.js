@@ -206,6 +206,10 @@ const loginUser = asyncHandler(async (req, res) => {
     throw new ApiError(401, "Invalid user credentials");
   }
 
+  if (user.role === "librarian" && !user.isApproved) {
+    throw new ApiError(403, "Your librarian account is pending approval from an administrator.");
+  }
+
   if (!process.env.ACCESS_TOKEN_SECRET) {
     throw new ApiError(500, "ACCESS_TOKEN_SECRET is not configured");
   }

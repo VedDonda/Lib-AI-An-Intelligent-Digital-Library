@@ -4,6 +4,7 @@ import { Mail, Lock, ShieldCheck, Eye, EyeOff, Loader, ArrowLeft, CheckCircle } 
 import { Link, useNavigate } from "react-router-dom";
 import Input from "../components/Input";
 import PasswordStrengthMeter from "../components/PasswordStrengthMeter";
+import BackButton from "../components/BackButton";
 import {
     forgotPasswordRequest,
     verifyForgotPasswordOtpRequest,
@@ -143,17 +144,14 @@ const ForgotPasswordPage = () => {
                 </div> */}
 
                 <AnimatePresence>
-                    {step === "email" && (
-                        <motion.button
-                            initial={{ opacity: 0, x: -10 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: -10 }}
-                            onClick={() => window.history.back()}
-                            className="absolute top-8 left-8 z-50 p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-full transition-colors"
-                            title="Back to Login"
-                        >
-                            <ArrowLeft className="size-5" />
-                        </motion.button>
+                    {step !== "done" && (
+                        <BackButton
+                            onClick={() => {
+                                if (step === "otp") { setStep("email"); setError(""); setOtp(["", "", "", "", "", ""]); }
+                                else if (step === "reset") { setStep("otp"); setError(""); }
+                                else navigate("/login");
+                            }}
+                        />
                     )}
                 </AnimatePresence>
 
@@ -207,14 +205,7 @@ const ForgotPasswordPage = () => {
                             exit={{ opacity: 0, x: -20 }}
                             transition={{ duration: 0.3 }}
                         >
-                            <button
-                                onClick={() => { setStep("email"); setError(""); setOtp(["", "", "", "", "", ""]); }}
-                                className="flex items-center gap-1 text-zinc-400 hover:text-white text-sm mb-8 transition-colors"
-                            >
-                                <ArrowLeft className="size-4" /> Change email
-                            </button>
-
-                            <div className="mb-8">
+                            <div className="mb-8 mt-2">
                                 <h2 className="text-3xl font-bold mb-2 tracking-tight">Check your inbox</h2>
                                 <p className="text-zinc-500 text-sm">
                                     We sent a 6-digit code to <span className="text-white font-medium">{email}</span>

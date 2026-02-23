@@ -1,16 +1,17 @@
 import { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { Document, Page, pdfjs } from "react-pdf";
-import { ChevronLeft, ChevronRight, ArrowLeft, Loader, ZoomIn, ZoomOut } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader, ZoomIn, ZoomOut } from "lucide-react";
+import BackButton from "../components/BackButton";
 import { getBook } from "../lib/bookApi";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 
-// PDF.js worker
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 const BookReaderPage = () => {
     const { id } = useParams();
+    const navigate = useNavigate();
     const [book, setBook] = useState(null);
     const [numPages, setNumPages] = useState(null);
     const [pageNumber, setPageNumber] = useState(1);
@@ -83,24 +84,16 @@ const BookReaderPage = () => {
         <div
             className="flex flex-col h-screen bg-[#0a0a0a] text-white"
         >
-            {/* Top Bar */}
             <div className="flex items-center justify-between px-4 py-3 bg-[#050505] border-b border-zinc-800/50">
                 <div className="flex items-center gap-3">
-                    <Link
-                        to="/dashboard"
-                        className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors"
-                    >
-                        <ArrowLeft className="size-5" />
-                    </Link>
+                    <BackButton className="!static" onClick={() => navigate("/dashboard")} />
                     <div>
                         <h1 className="text-sm font-semibold leading-tight line-clamp-1">{book?.title}</h1>
                         <p className="text-xs text-zinc-500">{book?.author}</p>
                     </div>
                 </div>
 
-                {/* Controls */}
                 <div className="flex items-center gap-2">
-                    {/* Zoom */}
                     <button
                         onClick={() => setScale((s) => Math.max(0.5, s - 0.2))}
                         className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors"
@@ -119,7 +112,6 @@ const BookReaderPage = () => {
 
                     <div className="w-px h-6 bg-zinc-800 mx-1" />
 
-                    {/* Page nav */}
                     <button
                         onClick={() => goToPage(pageNumber - 1)}
                         disabled={pageNumber <= 1}
@@ -148,7 +140,6 @@ const BookReaderPage = () => {
                 </div>
             </div>
 
-            {/* PDF Viewer */}
             <div className="flex-1 overflow-auto flex justify-center py-6 px-4 bg-[#111111]">
                 {book?.pdfUrl && (
                     <Document

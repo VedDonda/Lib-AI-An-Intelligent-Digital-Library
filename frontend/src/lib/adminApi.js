@@ -8,36 +8,31 @@ const handleResponse = async (response) => {
     return data;
 };
 
-export const getAllBooks = async () => {
-    const response = await fetch(`${API_BASE_URL}/books`, {
-        credentials: "include",
-    });
-    return handleResponse(response);
-};
-
-export const getBook = async (id) => {
-    const response = await fetch(`${API_BASE_URL}/books/${id}`, {
-        credentials: "include",
-    });
-    return handleResponse(response);
-};
-
-export const uploadBook = async (formData, token) => {
-    const response = await fetch(`${API_BASE_URL}/books`, {
-        method: "POST",
-        credentials: "include",
+export const getPendingLibrarians = async (token) => {
+    const response = await fetch(`${API_BASE_URL}/admin/pending-librarians`, {
+        method: "GET",
         headers: {
+            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
         },
-        body: formData,
     });
     return handleResponse(response);
 };
 
-export const deleteBook = async (id, token) => {
-    const response = await fetch(`${API_BASE_URL}/books/${id}`, {
+export const approveLibrarian = async (id, token) => {
+    const response = await fetch(`${API_BASE_URL}/admin/approve-librarian/${id}`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+    });
+    return handleResponse(response);
+};
+
+export const rejectLibrarian = async (id, token) => {
+    const response = await fetch(`${API_BASE_URL}/admin/reject-librarian/${id}`, {
         method: "DELETE",
-        credentials: "include",
         headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,

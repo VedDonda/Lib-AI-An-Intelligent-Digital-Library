@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Mail, Loader, BookOpen, ShieldCheck, RefreshCw, CheckCircle } from "lucide-react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { verifyOtpRequest, resendOtpRequest } from "../lib/authApi";
+import BackButton from "../components/BackButton";
 import "../index.css";
 
 const OTP_LENGTH = 6;
@@ -22,26 +23,23 @@ const VerifyOtpPage = () => {
 
     const inputRefs = useRef([]);
 
-    // Resend cooldown timer
     useEffect(() => {
         if (resendCooldown <= 0) return;
         const timer = setTimeout(() => setResendCooldown((c) => c - 1), 1000);
         return () => clearTimeout(timer);
     }, [resendCooldown]);
 
-    // Auto-focus first input on mount
     useEffect(() => {
         inputRefs.current[0]?.focus();
     }, []);
 
     const handleChange = (index, value) => {
-        if (!/^\d*$/.test(value)) return; // only digits
+        if (!/^\d*$/.test(value)) return;
 
         const newOtp = [...otp];
-        newOtp[index] = value.slice(-1); // take last char
+        newOtp[index] = value.slice(-1);
         setOtp(newOtp);
 
-        // Auto-focus next input
         if (value && index < OTP_LENGTH - 1) {
             inputRefs.current[index + 1]?.focus();
         }
@@ -111,8 +109,9 @@ const VerifyOtpPage = () => {
 
     return (
         <div className="flex h-screen w-full bg-[#050505] text-white overflow-hidden">
-            {/* Left Panel — Form */}
             <div className="w-full lg:w-1/2 flex flex-col justify-center px-8 sm:px-12 lg:px-20 xl:px-28 relative z-10">
+                <BackButton onClick={() => navigate("/login")} />
+
                 <div className="mb-6">
                     <div className="flex items-center gap-2 mb-2">
                         <div className="bg-white/10 p-2 rounded-lg">
@@ -155,7 +154,6 @@ const VerifyOtpPage = () => {
                             </motion.div>
                         )}
 
-                        {/* OTP Input Boxes */}
                         <div className="flex justify-center gap-3">
                             {otp.map((digit, index) => (
                                 <motion.input
@@ -183,7 +181,6 @@ const VerifyOtpPage = () => {
                             ))}
                         </div>
 
-                        {/* Verify Button */}
                         <motion.button
                             whileHover={{ scale: 1.01 }}
                             whileTap={{ scale: 0.99 }}
@@ -195,7 +192,6 @@ const VerifyOtpPage = () => {
                         </motion.button>
                     </form>
 
-                    {/* Resend */}
                     <div className="mt-6 text-center space-y-3">
                         <p className="text-sm text-zinc-500">
                             Didn't receive the code?{" "}
@@ -203,8 +199,8 @@ const VerifyOtpPage = () => {
                                 onClick={handleResend}
                                 disabled={resendCooldown > 0 || isResending}
                                 className={`font-medium inline-flex items-center gap-1 ${resendCooldown > 0
-                                        ? "text-zinc-600 cursor-not-allowed"
-                                        : "text-purple-400 hover:text-purple-300"
+                                    ? "text-zinc-600 cursor-not-allowed"
+                                    : "text-purple-400 hover:text-purple-300"
                                     } transition-colors`}
                             >
                                 {isResending ? (
@@ -225,7 +221,6 @@ const VerifyOtpPage = () => {
                 </motion.div>
             </div>
 
-            {/* Right Panel — Decorative */}
             <div className="hidden lg:flex w-1/2 relative bg-[#0a0a0a] m-3 rounded-[2rem] overflow-hidden border border-zinc-800/50 shadow-2xl">
                 <div className="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] bg-green-600/15 rounded-full blur-[120px]"></div>
                 <div className="absolute bottom-[-10%] left-[-10%] w-[400px] h-[400px] bg-purple-600/10 rounded-full blur-[100px]"></div>
@@ -249,7 +244,6 @@ const VerifyOtpPage = () => {
                         We've sent a verification code to your email. Enter it to activate your account.
                     </p>
 
-                    {/* Animated dots */}
                     <div className="flex gap-2">
                         {[0, 1, 2].map((i) => (
                             <motion.div

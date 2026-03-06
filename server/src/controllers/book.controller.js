@@ -108,4 +108,47 @@ const deleteBook = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, null, "Book deleted successfully"));
 });
 
-export { getAllBooks, getBookById, addBook, deleteBook };
+const updateBook = asyncHandler(async (req, res) => {
+    const { title, author, description } = req.body;
+    const bookId = req.params.id;
+
+    const book = await Book.findById(bookId);
+
+    if (!book) {
+        throw new ApiError(404, "Book not found");
+    }
+
+    if (req.user.role !== "admin" && book.uploadedBy.toString() !== req.user._id.toString()) {
+        throw new ApiError(403, "You do not have permission to edit this book");
+    }
+
+    const updateData = {};
+    if (title) updateData.title = title.trim();
+    if (author) updateData.author = author.trim();
+    if (description !== undefined) updateData.description = description.trim();
+    if (req.files?.coverImage?.[0]) {
+        if (book.coverImage) {
+            await deleteFromCloudinary(book.coverImage, "image");
+        }
+
+        const coverUpload = await uploadOnCloudinary(
+            req.files.coverImage[0].path,
+            "image"
+        );
+        if (coverUpload) {
+            updateData.coverImage = coverUpload.secure_url;
+        }
+    }
+
+    const updatedBook = await Book.findByIdAndUpdate(
+        bookId,
+        { $set: updateData },
+        { new: true }
+    ).populate("uploadedBy", "name");
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, updatedBook, "Book updated successfully"));
+});
+
+export { getAllBooks, getBookById, addBook, deleteBook, updateBook };

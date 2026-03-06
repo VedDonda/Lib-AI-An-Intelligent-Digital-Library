@@ -4,6 +4,7 @@ import {
     getBookById,
     addBook,
     deleteBook,
+    updateBook,
 } from "../controllers/book.controller.js";
 import { verifyJWT, authorizeRoles } from "../middlewares/auth.middleware.js";
 import { upload } from "../middlewares/multer.middleware.js";
@@ -22,6 +23,16 @@ router.post(
         { name: "pdfFile", maxCount: 1 },
     ]),
     addBook
+);
+
+router.patch(
+    "/:id",
+    verifyJWT,
+    authorizeRoles("librarian", "admin"),
+    upload.fields([
+        { name: "coverImage", maxCount: 1 }
+    ]),
+    updateBook
 );
 
 router.delete(

@@ -7,7 +7,8 @@ import PasswordStrengthMeter from "../components/PasswordStrengthMeter";
 import BackButton from "../components/BackButton";
 import { registerRequest } from "../lib/authApi";
 import "../index.css";
-import logo from "../assets/logo.jpeg";
+// import logo from "../assets/logo.jpeg";
+import BookDropCanvas from "../components/BookDropCanvas";
 
 const SignUpPage = () => {
     const navigate = useNavigate();
@@ -265,7 +266,7 @@ const SignUpPage = () => {
 
                 <div className="relative z-10 flex flex-col items-center justify-center w-full h-full p-12 text-center">
 
-                    <motion.div
+                    {/* <motion.div
                         animate={{ y: [0, -10, 0] }}
                         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                         className="relative mb-8"
@@ -274,7 +275,8 @@ const SignUpPage = () => {
                         <div className="relative w-80 h-80 rounded-full overflow-hidden shadow-inner border border-purple-200/20 backdrop-blur-sm">
                             <img src={logo} alt="LibAI Logo" className="w-full h-full object-cover" />
                         </div>
-                    </motion.div>
+                    </motion.div> */}
+                    <BookDropCanvas />
 
                     <h1 className="text-2xl font-bold mb-3 bg-gradient-to-b from-white to-white/60 bg-clip-text text-transparent">
                         Start Your Journey

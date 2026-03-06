@@ -45,3 +45,15 @@ export const deleteBook = async (id, token) => {
     });
     return handleResponse(response);
 };
+
+export const updateBook = async (id, formData, token) => {
+    const response = await fetch(`${API_BASE_URL}/books/${id}`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+    });
+    return handleResponse(response);
+};

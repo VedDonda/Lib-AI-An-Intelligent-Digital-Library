@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Search, BookOpen, Loader, User, Trash2 } from "lucide-react";
+import { Search, BookOpen, Loader, User, Trash2, Edit } from "lucide-react";
 import { Link } from "react-router-dom";
 import { getAllBooks, deleteBook } from "../lib/bookApi";
 import { useAuth } from "../context/AuthContext";
 import Navbar from "../components/Navbar";
+import EditBookModal from "../components/EditBookModal";
 
 const DashboardPage = () => {
     const { user, token } = useAuth();
@@ -13,6 +14,8 @@ const DashboardPage = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
     const [deletingId, setDeletingId] = useState(null);
+    const [editingBook, setEditingBook] = useState(null);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
     const isAdmin = user?.role === "admin";
     const isLibrarian = user?.role === "librarian";
@@ -31,8 +34,31 @@ const DashboardPage = () => {
         fetchBooks();
     }, []);
 
+    const fetchBooks = async () => {
+        setIsLoading(true);
+        try {
+            const response = await getAllBooks();
+            setBooks(response.data || []);
+        } catch (err) {
+            setError(err.message || "Failed to load books");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleEditClick = (e, book) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setEditingBook(book);
+        setIsEditModalOpen(true);
+    };
+
+    const handleEditSuccess = () => {
+        fetchBooks();
+    };
+
     const handleDelete = async (e, bookId, bookTitle) => {
-        e.preventDefault(); // prevent Link navigation
+        e.preventDefault();
         e.stopPropagation();
 
         if (!window.confirm(`Are you sure you want to delete "${bookTitle}"? This will remove it from Cloudinary and the database.`)) {
@@ -141,18 +167,27 @@ const DashboardPage = () => {
                                     </div>
 
                                     {(isAdmin || (isLibrarian && book.uploadedBy?._id === user?._id)) && (
-                                        <button
-                                            onClick={(e) => handleDelete(e, book._id, book.title)}
-                                            disabled={deletingId === book._id}
-                                            className="absolute top-2 right-2 z-10 p-2 bg-red-500/80 hover:bg-red-600 rounded-lg text-white opacity-0 group-hover:opacity-100 transition-all duration-200 backdrop-blur-sm disabled:opacity-50 cursor-pointer"
-                                            title="Delete book"
-                                        >
-                                            {deletingId === book._id ? (
-                                                <Loader className="size-4 animate-spin" />
-                                            ) : (
-                                                <Trash2 className="size-4" />
-                                            )}
-                                        </button>
+                                        <div className="absolute top-2 right-2 z-10 flex gap-2 opacity-0 group-hover:opacity-100 transition-all duration-200">
+                                            <button
+                                                onClick={(e) => handleEditClick(e, book)}
+                                                className="p-2 bg-purple-500/80 hover:bg-purple-600 rounded-lg text-white backdrop-blur-sm transition-colors cursor-pointer"
+                                                title="Edit book"
+                                            >
+                                                <Edit className="size-4" />
+                                            </button>
+                                            <button
+                                                onClick={(e) => handleDelete(e, book._id, book.title)}
+                                                disabled={deletingId === book._id}
+                                                className="p-2 bg-red-500/80 hover:bg-red-600 rounded-lg text-white backdrop-blur-sm disabled:opacity-50 cursor-pointer transition-colors"
+                                                title="Delete book"
+                                            >
+                                                {deletingId === book._id ? (
+                                                    <Loader className="size-4 animate-spin" />
+                                                ) : (
+                                                    <Trash2 className="size-4" />
+                                                )}
+                                            </button>
+                                        </div>
                                     )}
                                 </Link>
                             </motion.div>
@@ -160,6 +195,17 @@ const DashboardPage = () => {
                     </div>
                 )}
             </div>
+
+            <EditBookModal
+                isOpen={isEditModalOpen}
+                onClose={() => {
+                    setIsEditModalOpen(false);
+                    setEditingBook(null);
+                }}
+                book={editingBook}
+                token={token}
+                onSuccess={handleEditSuccess}
+            />
         </div>
     );
 };

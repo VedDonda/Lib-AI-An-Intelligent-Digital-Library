@@ -5,6 +5,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { generateOtp } from "../utils/generateOtp.js";
 import { sendEmail } from "../utils/sendEmail.js";
+import jwt from "jsonwebtoken";
 
 const cookieOptions = {
   httpOnly: true,
@@ -210,16 +211,19 @@ const loginUser = asyncHandler(async (req, res) => {
     throw new ApiError(403, "Your librarian account is pending approval from an administrator.");
   }
 
-  if (!process.env.ACCESS_TOKEN_SECRET) {
-    throw new ApiError(500, "ACCESS_TOKEN_SECRET is not configured");
-  }
-
   const accessToken = user.generateAccessToken();
+  const refreshToken = user.generateRefreshToken();
+
+  // Save refresh token in DB
+  user.refreshToken = refreshToken;
+  await user.save({ validateBeforeSave: false });
+
   const loggedInUser = await User.findById(user._id).select("-password");
 
   return res
     .status(200)
     .cookie("accessToken", accessToken, cookieOptions)
+    .cookie("refreshToken", refreshToken, cookieOptions)
     .json(
       new ApiResponse(
         200,
@@ -234,10 +238,46 @@ const loginUser = asyncHandler(async (req, res) => {
 
 // ─── Logout ─────────────────────────────────────────────────────────
 const logoutUser = asyncHandler(async (req, res) => {
+  // Clear refresh token from DB
+  await User.findByIdAndUpdate(req.user._id, { refreshToken: "" });
+
   return res
     .status(200)
     .clearCookie("accessToken", cookieOptions)
+    .clearCookie("refreshToken", cookieOptions)
     .json(new ApiResponse(200, {}, "User logged out successfully"));
+});
+
+// ─── Refresh Access Token ───────────────────────────────────────────
+
+const refreshAccessToken = asyncHandler(async (req, res) => {
+  const incomingRefreshToken = req.cookies?.refreshToken;
+
+  if (!incomingRefreshToken) {
+    throw new ApiError(401, "Refresh token not found");
+  }
+
+  // Verify the refresh token
+  let decoded;
+  try {
+    decoded = jwt.verify(incomingRefreshToken, process.env.REFRESH_TOKEN_SECRET);
+  } catch (_) {
+    throw new ApiError(401, "Refresh token is expired or invalid");
+  }
+
+  // Check if it matches the one stored in DB
+  const user = await User.findById(decoded._id).select("+refreshToken");
+  if (!user || user.refreshToken !== incomingRefreshToken) {
+    throw new ApiError(401, "Refresh token is expired or invalid");
+  }
+
+  // Generate new access token only
+  const accessToken = user.generateAccessToken();
+
+  return res
+    .status(200)
+    .cookie("accessToken", accessToken, cookieOptions)
+    .json(new ApiResponse(200, { accessToken }, "Access token refreshed"));
 });
 
 // ─── Other handlers ─────────────────────────────────────────────────
@@ -373,5 +413,5 @@ const resetPassword = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, {}, "Password reset successfully"));
 });
 
-export { registerUser, verifyOtp, resendOtp, loginUser, logoutUser, getCurrentUser, librarianDashboard, sendForgotPasswordOtp, verifyForgotPasswordOtp, resetPassword };
+export { registerUser, verifyOtp, resendOtp, loginUser, logoutUser, refreshAccessToken, getCurrentUser, librarianDashboard, sendForgotPasswordOtp, verifyForgotPasswordOtp, resetPassword };
 

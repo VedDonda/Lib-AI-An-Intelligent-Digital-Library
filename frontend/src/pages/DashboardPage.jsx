@@ -89,7 +89,7 @@ const DashboardPage = () => {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold tracking-tight mb-2">Digital Library</h1>
-                    <p className="text-zinc-500 text-sm">Browse and read books from your college library — anytime, anywhere.</p>
+                    <p className="text-zinc-500 text-sm">Browse and read books from your college library - anytime, anywhere.</p>
                 </div>
 
                 <div className="relative mb-8 max-w-md">

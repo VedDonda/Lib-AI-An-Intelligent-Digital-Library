@@ -8,6 +8,7 @@ import AddBookPage from "./pages/AddBookPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import AdminDashboardPage from "./pages/AdminDashboardPage";
+import ProfilePage from "./pages/ProfilePage";
 
 function App() {
   return (
@@ -40,6 +41,16 @@ function App() {
           element={
             <ProtectedRoute requiredRole="admin">
               <AdminDashboardPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Profile — any logged-in user */}
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <ProfilePage />
             </ProtectedRoute>
           }
         />

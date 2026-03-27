@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { logoutRequest } from "../lib/authApi";
+import { logoutRequest, refreshTokenRequest } from "../lib/authApi";
 
 const AuthContext = createContext(null);
 
@@ -9,13 +9,39 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const savedToken = localStorage.getItem("accessToken");
-        const savedUser = localStorage.getItem("user");
-        if (savedToken && savedUser) {
-            setToken(savedToken);
-            setUser(JSON.parse(savedUser));
-        }
-        setLoading(false);
+        const restoreSession = async () => {
+            const savedToken = localStorage.getItem("accessToken");
+            const savedUser = localStorage.getItem("user");
+
+            if (!savedToken || !savedUser) {
+                setLoading(false);
+                return;
+            }
+
+            try {
+                const payload = JSON.parse(atob(savedToken.split(".")[1]));
+
+                if (payload.exp * 1000 > Date.now()) {
+                    // Access token still valid
+                    setToken(savedToken);
+                    setUser(JSON.parse(savedUser));
+                } else {
+                    // Access token expired — try refreshing
+                    const res = await refreshTokenRequest();
+                    const newToken = res.data.accessToken;
+                    localStorage.setItem("accessToken", newToken);
+                    setToken(newToken);
+                    setUser(JSON.parse(savedUser));
+                }
+            } catch (_) {
+                // Refresh also failed — fully logout
+                localStorage.removeItem("accessToken");
+                localStorage.removeItem("user");
+            }
+            setLoading(false);
+        };
+
+        restoreSession();
     }, []);
 
     const login = (accessToken, userData) => {

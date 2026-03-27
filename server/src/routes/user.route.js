@@ -4,6 +4,7 @@ import {
   librarianDashboard,
   loginUser,
   logoutUser,
+  refreshAccessToken,
   registerUser,
   verifyOtp,
   resendOtp,
@@ -20,6 +21,7 @@ router.post("/verify-otp", verifyOtp);
 router.post("/resend-otp", resendOtp);
 router.post("/login", loginUser);
 router.post("/logout", verifyJWT, logoutUser);
+router.post("/refresh-token", refreshAccessToken);
 router.get("/me", verifyJWT, getCurrentUser);
 router.get("/librarian", verifyJWT, authorizeRoles("librarian"), librarianDashboard);
 

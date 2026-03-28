@@ -13,31 +13,41 @@ export const AuthProvider = ({ children }) => {
             const savedToken = localStorage.getItem("accessToken");
             const savedUser = localStorage.getItem("user");
 
-            if (!savedToken || !savedUser) {
-                setLoading(false);
-                return;
+            // Case 1: Access token exists and is still valid
+            if (savedToken) {
+                try {
+                    const payload = JSON.parse(atob(savedToken.split(".")[1]));
+                    if (payload.exp * 1000 > Date.now()) {
+                        setToken(savedToken);
+                        if (savedUser) setUser(JSON.parse(savedUser));
+                        setLoading(false);
+                        return;
+                    }
+                } catch (_) {}
             }
 
+            // Case 2: No access token or it's expired — try refresh token
             try {
-                const payload = JSON.parse(atob(savedToken.split(".")[1]));
+                const res = await refreshTokenRequest();
+                const newToken = res.data.accessToken;
+                localStorage.setItem("accessToken", newToken);
+                setToken(newToken);
 
-                if (payload.exp * 1000 > Date.now()) {
-                    // Access token still valid
-                    setToken(savedToken);
+                if (savedUser) {
                     setUser(JSON.parse(savedUser));
                 } else {
-                    // Access token expired — try refreshing
-                    const res = await refreshTokenRequest();
-                    const newToken = res.data.accessToken;
-                    localStorage.setItem("accessToken", newToken);
-                    setToken(newToken);
-                    setUser(JSON.parse(savedUser));
+                    // Extract user info from the new token
+                    const payload = JSON.parse(atob(newToken.split(".")[1]));
+                    const userData = { _id: payload._id, name: payload.name, email: payload.email, role: payload.role };
+                    setUser(userData);
+                    localStorage.setItem("user", JSON.stringify(userData));
                 }
             } catch (_) {
-                // Refresh also failed — fully logout
+                // Refresh token also invalid/expired — fully logout
                 localStorage.removeItem("accessToken");
                 localStorage.removeItem("user");
             }
+
             setLoading(false);
         };
 

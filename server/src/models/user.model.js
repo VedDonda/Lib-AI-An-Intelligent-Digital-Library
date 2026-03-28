@@ -40,6 +40,12 @@ const userSchema = new mongoose.Schema(
       type: String,
       select: false,
     },
+    bookmarks: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Book",
+      },
+    ],
   },
   { timestamps: true }
 );

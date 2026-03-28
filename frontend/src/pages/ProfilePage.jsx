@@ -1,7 +1,6 @@
 import { useAuth } from "../context/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 import { User, ArrowLeft, BookOpen, Shield, Calendar, Plus } from "lucide-react";
-import Navbar from "../components/Navbar";
 
 const ProfilePage = () => {
     const { user } = useAuth();
@@ -18,9 +17,7 @@ const ProfilePage = () => {
         : "N/A";
 
     return (
-        <div className="min-h-screen bg-[#050505] text-white">
-            <Navbar />
-
+        <div className="text-white">
             <div className="max-w-2xl mx-auto px-4 py-12">
                 {/* Back button */}
                 <button

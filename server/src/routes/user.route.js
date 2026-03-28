@@ -1,17 +1,14 @@
 import { Router } from "express";
 import {
-  getCurrentUser,
-  librarianDashboard,
   loginUser,
   logoutUser,
   refreshAccessToken,
   registerUser,
   verifyOtp,
   resendOtp,
-  sendForgotPasswordOtp,
-  verifyForgotPasswordOtp,
-  resetPassword,
 } from "../controllers/auth.controller.js";
+import { getCurrentUser, librarianDashboard, toggleBookmark, getBookmarks } from "../controllers/user.controller.js";
+import { sendForgotPasswordOtp, verifyForgotPasswordOtp, resetPassword } from "../controllers/password.controller.js";
 import { authorizeRoles, verifyJWT } from "../middlewares/auth.middleware.js";
 
 const router = Router();
@@ -28,5 +25,8 @@ router.get("/librarian", verifyJWT, authorizeRoles("librarian"), librarianDashbo
 router.post("/forgot-password", sendForgotPasswordOtp);
 router.post("/forgot-password/verify-otp", verifyForgotPasswordOtp);
 router.post("/forgot-password/reset", resetPassword);
+
+router.post("/bookmark/:bookId", verifyJWT, toggleBookmark);
+router.get("/bookmarks", verifyJWT, getBookmarks);
 
 export default router;

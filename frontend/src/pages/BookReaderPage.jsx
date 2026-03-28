@@ -19,6 +19,11 @@ const BookReaderPage = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
     const [pageInput, setPageInput] = useState("1");
+    const [isPageLoading, setIsPageLoading] = useState(true);
+
+    useEffect(() => {
+        setIsPageLoading(true);
+    }, [pageNumber]);
 
     useEffect(() => {
         const fetchBook = async () => {
@@ -140,7 +145,12 @@ const BookReaderPage = () => {
                 </div>
             </div>
 
-            <div className="flex-1 overflow-auto flex justify-center py-6 px-4 bg-[#111111]">
+            <div className="flex-1 overflow-auto flex justify-center py-6 px-4 bg-[#111111] relative">
+                {isPageLoading && (
+                    <div className="absolute inset-0 z-10 flex items-center justify-center bg-[#111111]">
+                        <Loader className="size-8 text-purple-400 animate-spin" />
+                    </div>
+                )}
                 {book?.pdfUrl && (
                     <Document
                         file={book.pdfUrl}
@@ -163,6 +173,7 @@ const BookReaderPage = () => {
                             className="shadow-2xl shadow-black/50 rounded-lg overflow-hidden"
                             renderAnnotationLayer={true}
                             renderTextLayer={true}
+                            onLoadSuccess={() => setIsPageLoading(false)}
                         />
                     </Document>
                 )}

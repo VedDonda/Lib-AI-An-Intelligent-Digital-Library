@@ -6,7 +6,7 @@ const ProtectedRoute = ({ children, requiredRole }) => {
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center h-screen bg-[#050505]">
+            <div className="flex items-center justify-center h-full min-h-[50vh] bg-[#050505]">
                 <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
             </div>
         );

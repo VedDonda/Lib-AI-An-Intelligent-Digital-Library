@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CheckCircle, XCircle, Loader, User, ShieldCheck } from "lucide-react";
-import Navbar from "../components/Navbar";
 import { useAuth } from "../context/AuthContext";
 import { getPendingLibrarians, approveLibrarian, rejectLibrarian } from "../lib/adminApi";
 import BackButton from "../components/BackButton";
@@ -54,11 +53,8 @@ const AdminDashboardPage = () => {
     };
 
     return (
-        <div className="h-screen bg-[#050505] text-white flex flex-col overflow-hidden">
-            <Navbar />
-
-            <div className="flex-1 overflow-y-auto">
-                <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="text-white">
+            <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                     <BackButton className="!static mb-6" />
                     <div className="mb-8">
                         <div className="flex items-center gap-3 mb-2">
@@ -134,7 +130,6 @@ const AdminDashboardPage = () => {
                             </AnimatePresence>
                         </div>
                     )}
-                </div>
             </div>
         </div>
     );

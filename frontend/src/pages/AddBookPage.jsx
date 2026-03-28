@@ -1,10 +1,9 @@
 import { useState, useRef } from "react";
 import { motion } from "framer-motion";
-import { Upload, FileText, Image, Loader, CheckCircle, BookOpen } from "lucide-react";
+import { Upload, FileText, Image, Loader, CheckCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { uploadBook } from "../lib/bookApi";
-import Navbar from "../components/Navbar";
 import BackButton from "../components/BackButton";
 
 const AddBookPage = () => {
@@ -68,11 +67,8 @@ const AddBookPage = () => {
     };
 
     return (
-        <div className="h-screen bg-[#050505] text-white flex flex-col overflow-hidden">
-            <Navbar />
-
-            <div className="flex-1 overflow-y-auto">
-                <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
+        <div className="text-white">
+            <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
                     <BackButton className="!static mb-6" onClick={() => navigate(-1)} />
                     <div className="mb-8">
                         <h1 className="text-3xl font-bold tracking-tight mb-2">Add New Book</h1>
@@ -94,89 +90,98 @@ const AddBookPage = () => {
                             </motion.div>
                         )}
 
-                        <div className="space-y-1">
-                            <label className="text-xs font-medium text-zinc-400 ml-1">Book Title *</label>
-                            <input
-                                type="text"
-                                placeholder="e.g. Operating System Concepts"
-                                value={title}
-                                onChange={(e) => setTitle(e.target.value)}
-                                className="w-full px-4 py-3 bg-zinc-900/50 border border-zinc-800 rounded-xl text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-all"
-                            />
-                        </div>
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
+                            {/* Left Column: Details */}
+                            <div className="space-y-6 lg:col-span-2">
+                                <div className="space-y-1">
+                                    <label className="text-xs font-medium text-zinc-400 ml-1">Book Title *</label>
+                                    <input
+                                        type="text"
+                                        placeholder="e.g. Operating System Concepts"
+                                        value={title}
+                                        onChange={(e) => setTitle(e.target.value)}
+                                        className="w-full px-4 py-3 bg-zinc-900/50 border border-zinc-800 rounded-xl text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-all"
+                                    />
+                                </div>
 
-                        <div className="space-y-1">
-                            <label className="text-xs font-medium text-zinc-400 ml-1">Author *</label>
-                            <input
-                                type="text"
-                                placeholder="e.g. Abraham Silberschatz"
-                                value={author}
-                                onChange={(e) => setAuthor(e.target.value)}
-                                className="w-full px-4 py-3 bg-zinc-900/50 border border-zinc-800 rounded-xl text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-all"
-                            />
-                        </div>
+                                <div className="space-y-1">
+                                    <label className="text-xs font-medium text-zinc-400 ml-1">Author *</label>
+                                    <input
+                                        type="text"
+                                        placeholder="e.g. Abraham Silberschatz"
+                                        value={author}
+                                        onChange={(e) => setAuthor(e.target.value)}
+                                        className="w-full px-4 py-3 bg-zinc-900/50 border border-zinc-800 rounded-xl text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-all"
+                                    />
+                                </div>
 
-                        <div className="space-y-1">
-                            <label className="text-xs font-medium text-zinc-400 ml-1">Description</label>
-                            <textarea
-                                placeholder="Short description of the book..."
-                                value={description}
-                                onChange={(e) => setDescription(e.target.value)}
-                                rows={3}
-                                className="w-full px-4 py-3 bg-zinc-900/50 border border-zinc-800 rounded-xl text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-all resize-none"
-                            />
-                        </div>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div
-                                onClick={() => pdfInputRef.current?.click()}
-                                className="cursor-pointer border-2 border-dashed border-zinc-700 hover:border-purple-500/40 rounded-2xl p-6 text-center transition-colors group"
-                            >
-                                <input
-                                    ref={pdfInputRef}
-                                    type="file"
-                                    accept=".pdf"
-                                    onChange={(e) => setPdfFile(e.target.files[0])}
-                                    className="hidden"
-                                />
-                                <div className="flex flex-col items-center gap-2">
-                                    {pdfFile ? (
-                                        <>
-                                            <FileText className="size-10 text-purple-400" />
-                                            <p className="text-xs text-purple-300 font-medium line-clamp-2">{pdfFile.name}</p>
-                                            <p className="text-xs text-zinc-600">{(pdfFile.size / (1024 * 1024)).toFixed(1)} MB</p>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Upload className="size-10 text-zinc-600 group-hover:text-purple-400 transition-colors" />
-                                            <p className="text-xs text-zinc-500">Upload PDF *</p>
-                                            <p className="text-xs text-zinc-700">Max 50MB</p>
-                                        </>
-                                    )}
+                                <div className="space-y-1">
+                                    <label className="text-xs font-medium text-zinc-400 ml-1">Description</label>
+                                    <textarea
+                                        placeholder="Short description of the book..."
+                                        value={description}
+                                        onChange={(e) => setDescription(e.target.value)}
+                                        rows={5}
+                                        className="w-full px-4 py-3 bg-zinc-900/50 border border-zinc-800 rounded-xl text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-all resize-none"
+                                    />
                                 </div>
                             </div>
 
-                            <div
-                                onClick={() => coverInputRef.current?.click()}
-                                className="cursor-pointer border-2 border-dashed border-zinc-700 hover:border-purple-500/40 rounded-2xl p-6 text-center transition-colors group overflow-hidden"
-                            >
-                                <input
-                                    ref={coverInputRef}
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={handleCoverChange}
-                                    className="hidden"
-                                />
-                                <div className="flex flex-col items-center gap-2">
-                                    {coverPreview ? (
-                                        <img src={coverPreview} alt="Cover preview" className="w-20 h-28 object-cover rounded-lg" />
-                                    ) : (
-                                        <>
-                                            <Image className="size-10 text-zinc-600 group-hover:text-purple-400 transition-colors" />
-                                            <p className="text-xs text-zinc-500">Cover Image</p>
-                                            <p className="text-xs text-zinc-700">Optional</p>
-                                        </>
-                                    )}
+                            {/* Right Column: Uploads */}
+                            <div className="flex flex-col gap-6">
+                                <div
+                                    onClick={() => pdfInputRef.current?.click()}
+                                    className="flex-1 cursor-pointer border-2 border-dashed border-zinc-700 hover:border-purple-500/40 rounded-2xl p-6 flex flex-col items-center justify-center transition-colors group"
+                                >
+                                    <input
+                                        ref={pdfInputRef}
+                                        type="file"
+                                        accept=".pdf"
+                                        onChange={(e) => setPdfFile(e.target.files[0])}
+                                        className="hidden"
+                                    />
+                                    <div className="flex flex-col items-center gap-2 text-center">
+                                        {pdfFile ? (
+                                            <>
+                                                <FileText className="size-10 text-purple-400 mb-1" />
+                                                <p className="text-sm font-medium text-purple-300 line-clamp-2 max-w-[250px]">{pdfFile.name}</p>
+                                                <p className="text-xs text-zinc-500">{(pdfFile.size / (1024 * 1024)).toFixed(1)} MB</p>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Upload className="size-10 text-zinc-600 group-hover:text-purple-400 transition-colors mb-1" />
+                                                <p className="text-sm font-medium text-zinc-300">Upload Book PDF <span className="text-purple-400">*</span></p>
+                                                <p className="text-xs text-zinc-500">Max size 50MB</p>
+                                            </>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div
+                                    onClick={() => coverInputRef.current?.click()}
+                                    className="flex-1 cursor-pointer border-2 border-dashed border-zinc-700 hover:border-purple-500/40 rounded-2xl p-6 flex flex-col items-center justify-center transition-colors group overflow-hidden"
+                                >
+                                    <input
+                                        ref={coverInputRef}
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleCoverChange}
+                                        className="hidden"
+                                    />
+                                    <div className="flex flex-col items-center gap-2 text-center">
+                                        {coverPreview ? (
+                                            <>
+                                                <img src={coverPreview} alt="Cover preview" className="w-[88px] h-[120px] object-cover rounded-lg shadow-lg" />
+                                                <p className="text-xs text-zinc-400 mt-2 hover:text-white transition-colors">Change Cover</p>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Image className="size-10 text-zinc-600 group-hover:text-purple-400 transition-colors mb-1" />
+                                                <p className="text-sm font-medium text-zinc-300">Upload Cover Image</p>
+                                                <p className="text-xs text-zinc-500">Optional (JPEG, PNG)</p>
+                                            </>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -191,7 +196,6 @@ const AddBookPage = () => {
                             {isLoading ? <Loader className="w-5 h-5 animate-spin mx-auto" /> : "Upload Book"}
                         </motion.button>
                     </form>
-                </div>
             </div>
         </div>
     );

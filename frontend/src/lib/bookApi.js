@@ -57,3 +57,24 @@ export const updateBook = async (id, formData, token) => {
     });
     return handleResponse(response);
 };
+
+export const toggleBookmark = async (bookId, token) => {
+    const response = await fetch(`${API_BASE_URL}/users/bookmark/${bookId}`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+    return handleResponse(response);
+};
+
+export const getBookmarks = async (token) => {
+    const response = await fetch(`${API_BASE_URL}/users/bookmarks`, {
+        credentials: "include",
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+    return handleResponse(response);
+};

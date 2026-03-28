@@ -1,15 +1,32 @@
+import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { BookOpen, LogOut, Plus, Library, ShieldCheck } from "lucide-react";
+import { LogOut, Plus, Library, ShieldCheck, User } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
 const Navbar = () => {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
+    const [menuOpen, setMenuOpen] = useState(false);
+    const menuRef = useRef(null);
 
     const handleLogout = async () => {
+        setMenuOpen(false);
         await logout();
         navigate("/login");
     };
+
+    // Close menu on outside click
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (menuRef.current && !menuRef.current.contains(e.target)) {
+                setMenuOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    const initials = user?.name?.charAt(0)?.toUpperCase() || "?";
 
     return (
         <nav className="sticky top-0 z-50 bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-zinc-800/50">
@@ -43,19 +60,44 @@ const Navbar = () => {
                             </Link>
                         )}
 
+                        {/* Avatar + Dropdown */}
                         {user && (
-                            <div className="flex items-center gap-3">
-                                <div className="text-right hidden sm:block">
-                                    <p className="text-sm font-medium text-white leading-tight">{user.name}</p>
-                                    <p className="text-xs text-zinc-500 capitalize">{user.role}</p>
-                                </div>
+                            <div className="relative" ref={menuRef}>
                                 <button
-                                    onClick={handleLogout}
-                                    className="p-2 text-zinc-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
-                                    title="Logout"
+                                    onClick={() => setMenuOpen((prev) => !prev)}
+                                    className="w-9 h-9 rounded-full bg-purple-600 flex items-center justify-center text-white font-semibold text-sm hover:bg-purple-500 transition-colors cursor-pointer select-none"
+                                    title={user.name}
                                 >
-                                    <LogOut className="size-5" />
+                                    {initials}
                                 </button>
+
+                                {menuOpen && (
+                                    <div className="absolute right-0 mt-2 w-56 bg-zinc-900 border border-zinc-700/60 rounded-xl shadow-2xl shadow-black/40 overflow-hidden animate-in fade-in slide-in-from-top-1 duration-150">
+                                        {/* Profile section */}
+                                        <div className="px-4 py-3 border-b border-zinc-700/40">
+                                            <p className="text-sm font-medium text-white truncate">{user.name}</p>
+                                            <p className="text-xs text-zinc-400 capitalize mt-0.5">{user.role}</p>
+                                        </div>
+
+                                        {/* Menu items */}
+                                        <div className="py-1">
+                                            <button
+                                                onClick={() => { setMenuOpen(false); navigate("/profile"); }}
+                                                className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors cursor-pointer"
+                                            >
+                                                <User className="size-4" />
+                                                Profile
+                                            </button>
+                                            <button
+                                                onClick={handleLogout}
+                                                className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors cursor-pointer"
+                                            >
+                                                <LogOut className="size-4" />
+                                                Logout
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         )}
 

@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Search, BookOpen, Loader, User, Trash2, Edit } from "lucide-react";
+import { Search, BookOpen, Loader, User, Trash2, Edit, Bookmark } from "lucide-react";
 import { Link } from "react-router-dom";
-import { getAllBooks, deleteBook } from "../lib/bookApi";
+import { getAllBooks, deleteBook, toggleBookmark, getBookmarks } from "../lib/bookApi";
 import { useAuth } from "../context/AuthContext";
-import Navbar from "../components/Navbar";
 import EditBookModal from "../components/EditBookModal";
 
 const DashboardPage = () => {
@@ -16,6 +15,8 @@ const DashboardPage = () => {
     const [deletingId, setDeletingId] = useState(null);
     const [editingBook, setEditingBook] = useState(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [bookmarkedIds, setBookmarkedIds] = useState(new Set());
+    const [bookmarkingId, setBookmarkingId] = useState(null);
 
     const isAdmin = user?.role === "admin";
     const isLibrarian = user?.role === "librarian";
@@ -32,7 +33,17 @@ const DashboardPage = () => {
             }
         };
         fetchBooks();
-    }, []);
+
+        // Load user's existing bookmarks
+        if (user && token) {
+            getBookmarks(token)
+                .then((res) => {
+                    const ids = (res.data || []).map((b) => b._id);
+                    setBookmarkedIds(new Set(ids));
+                })
+                .catch(() => {});
+        }
+    }, [user, token]);
 
     const fetchBooks = async () => {
         setIsLoading(true);
@@ -76,6 +87,26 @@ const DashboardPage = () => {
         }
     };
 
+    const handleBookmark = async (e, bookId) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!user) return;
+        setBookmarkingId(bookId);
+        try {
+            await toggleBookmark(bookId, token);
+            setBookmarkedIds((prev) => {
+                const next = new Set(prev);
+                if (next.has(bookId)) next.delete(bookId);
+                else next.add(bookId);
+                return next;
+            });
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setBookmarkingId(null);
+        }
+    };
+
     const filteredBooks = books.filter(
         (book) =>
             book.title.toLowerCase().includes(search.toLowerCase()) ||
@@ -83,11 +114,8 @@ const DashboardPage = () => {
     );
 
     return (
-        <div className="h-screen bg-[#050505] text-white flex flex-col overflow-hidden">
-            <Navbar />
-
-            <div className="flex-1 overflow-y-auto">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="text-white">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                     <div className="mb-8">
                         <h1 className="text-3xl font-bold tracking-tight mb-2">Digital Library</h1>
                         <p className="text-zinc-500 text-sm">Browse and read books from your college library — anytime, anywhere.</p>
@@ -155,6 +183,24 @@ const DashboardPage = () => {
                                             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
                                                 <span className="text-sm font-medium text-purple-300">Read Book →</span>
                                             </div>
+
+                                            {/* Bookmark button — always visible top-left */}
+                                            {user && (
+                                                <button
+                                                    onClick={(e) => handleBookmark(e, book._id)}
+                                                    disabled={bookmarkingId === book._id}
+                                                    title={bookmarkedIds.has(book._id) ? "Remove bookmark" : "Bookmark this book"}
+                                                    className="absolute top-2 left-2 z-10 p-1.5 rounded-lg backdrop-blur-sm transition-all disabled:opacity-50 cursor-pointer"
+                                                >
+                                                    <Bookmark
+                                                        className={`size-5 transition-all ${
+                                                            bookmarkedIds.has(book._id)
+                                                                ? "text-purple-400 fill-purple-400"
+                                                                : "text-white/60 hover:text-purple-300"
+                                                        }`}
+                                                    />
+                                                </button>
+                                            )}
                                         </div>
 
                                         <div className="p-4">
@@ -196,8 +242,6 @@ const DashboardPage = () => {
                         </div>
                     )}
                 </div>
-            </div>
-
             <EditBookModal
                 isOpen={isEditModalOpen}
                 onClose={() => {

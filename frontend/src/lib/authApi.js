@@ -68,6 +68,14 @@ export const logoutRequest = async (token) => {
   return handleResponse(response);
 };
 
+export const refreshTokenRequest = async () => {
+  const response = await fetch(`${API_BASE_URL}/users/refresh-token`, {
+    method: "POST",
+    credentials: "include",
+  });
+  return handleResponse(response);
+};
+
 export const forgotPasswordRequest = async ({ email }) => {
   const response = await fetch(`${API_BASE_URL}/api/v1/users/forgot-password`, {
     method: "POST",

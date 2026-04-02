@@ -89,7 +89,7 @@ const BookReaderPage = () => {
         <div
             className="flex flex-col h-screen bg-[#0a0a0a] text-white"
         >
-            <div className="flex items-center justify-between px-4 py-3 bg-[#050505] border-b border-zinc-800/50">
+            <div className="flex items-center justify-between px-4 h-16 bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-zinc-800/50">
                 <div className="flex items-center gap-3">
                     <BackButton className="!static" onClick={() => navigate("/dashboard")} />
                     <div>

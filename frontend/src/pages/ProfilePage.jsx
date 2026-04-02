@@ -1,6 +1,7 @@
 import { useAuth } from "../context/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 import { User, ArrowLeft, BookOpen, Shield, Calendar, Plus } from "lucide-react";
+import Navbar from "../components/Navbar";
 
 const ProfilePage = () => {
     const { user } = useAuth();
@@ -17,8 +18,9 @@ const ProfilePage = () => {
         : "N/A";
 
     return (
-        <div className="text-white">
-            <div className="max-w-2xl mx-auto px-4 py-12">
+        <div className="text-white flex flex-col min-h-full">
+            <Navbar title="Profile" />
+            <div className="max-w-2xl mx-auto px-4 py-4 w-full flex-1">
                 {/* Back button */}
                 <button
                     onClick={() => navigate(-1)}

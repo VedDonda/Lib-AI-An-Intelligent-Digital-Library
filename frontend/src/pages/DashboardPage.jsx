@@ -4,6 +4,7 @@ import { Search, BookOpen, Loader, User, Trash2, Edit, Bookmark } from "lucide-r
 import { Link } from "react-router-dom";
 import { getAllBooks, deleteBook, toggleBookmark, getBookmarks } from "../lib/bookApi";
 import { useAuth } from "../context/AuthContext";
+import Navbar from "../components/Navbar";
 import EditBookModal from "../components/EditBookModal";
 
 const DashboardPage = () => {
@@ -114,12 +115,13 @@ const DashboardPage = () => {
     );
 
     return (
-        <div className="text-white">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                    <div className="mb-8">
-                        <h1 className="text-3xl font-bold tracking-tight mb-2">Digital Library</h1>
-                        <p className="text-zinc-500 text-sm">Browse and read books from your college library — anytime, anywhere.</p>
-                    </div>
+        <div className="text-white flex flex-col min-h-full">
+            <Navbar 
+                title="Digital Library" 
+                subtitle="Browse and read books from your college library — anytime, anywhere." 
+            />
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 w-full flex-1">
+
 
                     <div className="relative mb-8 max-w-md">
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-zinc-500" />

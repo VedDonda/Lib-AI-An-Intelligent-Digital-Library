@@ -4,7 +4,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { uploadOnCloudinary, deleteFromCloudinary } from "../utils/cloudinary.js";
 
-// ─── Get all books (public) ─────────────────────────────────────────
+//Get all books (public)
 const getAllBooks = asyncHandler(async (req, res) => {
     const books = await Book.find()
         .select("-__v")
@@ -16,7 +16,7 @@ const getAllBooks = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, books, "Books fetched successfully"));
 });
 
-// ─── Get single book (public) ───────────────────────────────────────
+//Get single book (public)
 const getBookById = asyncHandler(async (req, res) => {
     const book = await Book.findById(req.params.id)
         .populate("uploadedBy", "name");
@@ -30,7 +30,7 @@ const getBookById = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, book, "Book fetched successfully"));
 });
 
-// ─── Upload book (librarian only) ───────────────────────────────────
+//Upload book (librarian only)
 const addBook = asyncHandler(async (req, res) => {
     const { title, author, description } = req.body;
 
@@ -79,7 +79,7 @@ const addBook = asyncHandler(async (req, res) => {
         .json(new ApiResponse(201, populatedBook, "Book uploaded successfully"));
 });
 
-// ─── Delete book (librarian only) ───────────────────────────────────
+//Delete book (librarian only)
 const deleteBook = asyncHandler(async (req, res) => {
     const book = await Book.findById(req.params.id);
 

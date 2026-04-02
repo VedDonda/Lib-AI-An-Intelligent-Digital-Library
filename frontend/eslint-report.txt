@@ -1,0 +1,51 @@
+﻿
+C:\Users\ved\OneDrive\Desktop\BMP\Lib-AI-An-Intelligent-Digital-Library\frontend\src\components\BackButton.jsx
+  1:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\ved\OneDrive\Desktop\BMP\Lib-AI-An-Intelligent-Digital-Library\frontend\src\components\EditBookModal.jsx
+  2:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\ved\OneDrive\Desktop\BMP\Lib-AI-An-Intelligent-Digital-Library\frontend\src\components\FloatingShape.jsx
+  1:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\ved\OneDrive\Desktop\BMP\Lib-AI-An-Intelligent-Digital-Library\frontend\src\components\Input.jsx
+  1:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  3:24  error  'Icon' is defined but never used                                               no-unused-vars
+
+C:\Users\ved\OneDrive\Desktop\BMP\Lib-AI-An-Intelligent-Digital-Library\frontend\src\components\Sidebar.jsx
+  87:43  error  'Icon' is defined but never used  no-unused-vars
+
+C:\Users\ved\OneDrive\Desktop\BMP\Lib-AI-An-Intelligent-Digital-Library\frontend\src\context\AuthContext.jsx
+  36:22  error  '_' is defined but never used                                                                                                   no-unused-vars
+  55:52  error  '_' is defined but never used                                                                                                   no-unused-vars
+  55:55  error  Empty block statement                                                                                                           no-empty
+  69:14  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\Users\ved\OneDrive\Desktop\BMP\Lib-AI-An-Intelligent-Digital-Library\frontend\src\pages\AddBookPage.jsx
+  2:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\ved\OneDrive\Desktop\BMP\Lib-AI-An-Intelligent-Digital-Library\frontend\src\pages\AdminDashboardPage.jsx
+  2:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\ved\OneDrive\Desktop\BMP\Lib-AI-An-Intelligent-Digital-Library\frontend\src\pages\BookReaderPage.jsx
+  69:8  warning  React Hook useEffect has a missing dependency: 'goToPage'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\ved\OneDrive\Desktop\BMP\Lib-AI-An-Intelligent-Digital-Library\frontend\src\pages\DashboardPage.jsx
+  2:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\ved\OneDrive\Desktop\BMP\Lib-AI-An-Intelligent-Digital-Library\frontend\src\pages\ForgotPasswordPage.jsx
+   2:10  error    'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                                no-unused-vars
+  47:8   warning  React Hook useEffect has a missing dependency: 'navigate'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\ved\OneDrive\Desktop\BMP\Lib-AI-An-Intelligent-Digital-Library\frontend\src\pages\LoginPage.jsx
+   2:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  10:8   error  'logo' is defined but never used. Allowed unused vars must match /^[A-Z_]/u    no-unused-vars
+
+C:\Users\ved\OneDrive\Desktop\BMP\Lib-AI-An-Intelligent-Digital-Library\frontend\src\pages\SignUpPage.jsx
+  2:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\ved\OneDrive\Desktop\BMP\Lib-AI-An-Intelligent-Digital-Library\frontend\src\pages\VerifyOtpPage.jsx
+  2:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+Γ£û 20 problems (18 errors, 2 warnings)
+

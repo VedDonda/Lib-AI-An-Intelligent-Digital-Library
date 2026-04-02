@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { uploadBook } from "../lib/bookApi";
 import BackButton from "../components/BackButton";
+import Navbar from "../components/Navbar";
 
 const AddBookPage = () => {
     const { token } = useAuth();
@@ -67,13 +68,14 @@ const AddBookPage = () => {
     };
 
     return (
-        <div className="text-white">
-            <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
+        <div className="text-white flex flex-col min-h-full">
+            <Navbar 
+                title="Add New Book" 
+                subtitle="Upload a book to the digital library for students to access." 
+            />
+            <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 w-full flex-1">
                     <BackButton className="!static mb-6" onClick={() => navigate(-1)} />
-                    <div className="mb-8">
-                        <h1 className="text-3xl font-bold tracking-tight mb-2">Add New Book</h1>
-                        <p className="text-zinc-500 text-sm">Upload a book to the digital library for students to access.</p>
-                    </div>
+
 
                     <form onSubmit={handleSubmit} className="space-y-6">
                         {error && (

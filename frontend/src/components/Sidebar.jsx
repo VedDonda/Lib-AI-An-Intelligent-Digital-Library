@@ -7,7 +7,9 @@ import {
     ShieldCheck,
     User,
     LogOut,
+    LogIn,
     Bookmark,
+    Library,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
@@ -69,17 +71,16 @@ const Sidebar = () => {
                 ${expanded ? "w-56" : "w-14"}
             `}
         >
-            {/* Toggle button */}
-            <div className={`flex items-center h-16 border-b border-zinc-800/50 px-3 ${expanded ? "justify-end" : "justify-center"}`}>
-                <button
-                    onClick={() => setExpanded((v) => !v)}
-                    className="w-8 h-8 flex items-center justify-center rounded-full text-zinc-400 hover:text-white hover:bg-zinc-800 border border-zinc-700/50 transition-all"
-                    title={expanded ? "Collapse sidebar" : "Expand sidebar"}
-                >
-                    <ChevronRight
-                        className={`size-4 transition-transform duration-300 ${expanded ? "rotate-180" : ""}`}
-                    />
-                </button>
+            {/* Top Logo Area (Syncs with Navbar h-16) */}
+            <div className={`flex items-center h-16 border-b border-zinc-800/50 px-2 ${expanded ? "justify-start px-4" : "justify-center"}`}>
+                <Link to="/dashboard" className="flex items-center gap-2.5 group" title={!expanded ? "LibAI" : undefined}>
+                    <div className="bg-purple-500/15 p-2 rounded-lg group-hover:bg-purple-500/25 transition-colors flex-shrink-0">
+                        <Library className="size-5 text-purple-400" />
+                    </div>
+                    {expanded && (
+                        <span className="text-lg font-bold tracking-wide text-white overflow-hidden whitespace-nowrap">LibAI</span>
+                    )}
+                </Link>
             </div>
 
             {/* Nav Items */}
@@ -117,29 +118,62 @@ const Sidebar = () => {
                 })}
             </nav>
 
-            {/* User info + Logout at bottom */}
-            {user && (
-                <div className="border-t border-zinc-800/50 px-2 py-3 flex flex-col gap-1">
-                    {expanded && (
-                        <div className="px-2 py-1.5 mb-1">
-                            <p className="text-xs font-semibold text-white truncate">{user.name}</p>
-                            <p className="text-xs text-zinc-500 capitalize">{user.role}</p>
+            {/* Expand button placed after navbar */}
+            <div className={`px-2 py-2 flex ${expanded ? "justify-end" : "justify-center"}`}>
+                <button
+                    onClick={() => setExpanded((v) => !v)}
+                    className="w-8 h-8 flex items-center justify-center rounded-full text-zinc-400 hover:text-white hover:bg-zinc-800 border border-zinc-700/50 transition-all"
+                    title={expanded ? "Collapse sidebar" : "Expand sidebar"}
+                >
+                    <ChevronRight
+                        className={`size-4 transition-transform duration-300 ${expanded ? "rotate-180" : ""}`}
+                    />
+                </button>
+            </div>
+
+            {/* User info + Logout / Login at bottom */}
+            <div className="border-t border-zinc-800/50 px-2 py-3 flex flex-col gap-1">
+                {user ? (
+                    <>
+                        <div className={`flex items-center gap-3 px-2 py-1.5 mb-1 ${!expanded ? "justify-center" : ""}`}>
+                            <div className="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-white font-semibold flex-shrink-0" title={user.name}>
+                                {user.name?.charAt(0)?.toUpperCase()}
+                            </div>
+                            {expanded && (
+                                <div className="overflow-hidden">
+                                    <p className="text-sm font-semibold text-white truncate">{user.name}</p>
+                                    <p className="text-xs text-zinc-500 capitalize">{user.role}</p>
+                                </div>
+                            )}
                         </div>
-                    )}
-                    <button
-                        onClick={handleLogout}
-                        title={!expanded ? "Logout" : undefined}
+                        <button
+                            onClick={handleLogout}
+                            title={!expanded ? "Logout" : undefined}
+                            className={`
+                                flex items-center gap-3 rounded-xl px-2 py-2.5 text-red-400
+                                hover:bg-red-500/10 hover:text-red-300 transition-all
+                                ${expanded ? "justify-start" : "justify-center"}
+                            `}
+                        >
+                            <LogOut className="size-5 flex-shrink-0" />
+                            {expanded && <span className="text-sm font-medium">Logout</span>}
+                        </button>
+                    </>
+                ) : (
+                    <Link
+                        to="/login"
+                        title={!expanded ? "Login" : undefined}
                         className={`
-                            flex items-center gap-3 rounded-xl px-2 py-2.5 text-red-400
-                            hover:bg-red-500/10 hover:text-red-300 transition-all
+                            flex items-center gap-3 rounded-xl px-2 py-2.5 text-zinc-400
+                            hover:bg-purple-500/10 hover:text-purple-300 transition-all
                             ${expanded ? "justify-start" : "justify-center"}
                         `}
                     >
-                        <LogOut className="size-5 flex-shrink-0" />
-                        {expanded && <span className="text-sm font-medium">Logout</span>}
-                    </button>
-                </div>
-            )}
+                        <LogIn className="size-5 flex-shrink-0" />
+                        {expanded && <span className="text-sm font-medium">Login</span>}
+                    </Link>
+                )}
+            </div>
         </aside>
     );
 };

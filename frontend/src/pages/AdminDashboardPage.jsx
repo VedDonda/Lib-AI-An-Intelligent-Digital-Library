@@ -4,6 +4,7 @@ import { CheckCircle, XCircle, Loader, User, ShieldCheck } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { getPendingLibrarians, approveLibrarian, rejectLibrarian } from "../lib/adminApi";
 import BackButton from "../components/BackButton";
+import Navbar from "../components/Navbar";
 
 const AdminDashboardPage = () => {
     const { token } = useAuth();
@@ -53,18 +54,17 @@ const AdminDashboardPage = () => {
     };
 
     return (
-        <div className="text-white">
-            <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="text-white flex flex-col min-h-full">
+            <Navbar 
+                title="Admin Dashboard" 
+                subtitle="Review and approve new librarian account requests." 
+                // icon={ShieldCheck} 
+                // iconColor="text-rose-400" 
+                // iconBg="bg-rose-500/15" 
+            />
+            <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4 w-full flex-1">
                     <BackButton className="!static mb-6" />
-                    <div className="mb-8">
-                        <div className="flex items-center gap-3 mb-2">
-                            <div className="p-2 bg-rose-500/15 rounded-lg">
-                                <ShieldCheck className="size-6 text-rose-400" />
-                            </div>
-                            <h1 className="text-3xl font-bold tracking-tight">Admin Dashboard</h1>
-                        </div>
-                        <p className="text-zinc-500 text-sm">Review and approve new librarian account requests.</p>
-                    </div>
+
 
                     {isLoading && (
                         <div className="flex justify-center py-20">

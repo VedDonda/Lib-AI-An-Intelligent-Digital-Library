@@ -15,7 +15,6 @@ const librarianDashboard = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, req.user, "Welcome librarian"));
 });
 
-// ─── Toggle Bookmark ─────────────────────────────────────────────────
 const toggleBookmark = asyncHandler(async (req, res) => {
   const { bookId } = req.params;
   const userId = req.user._id;
@@ -38,7 +37,6 @@ const toggleBookmark = asyncHandler(async (req, res) => {
   );
 });
 
-// ─── Get Bookmarks ───────────────────────────────────────────────────
 const getBookmarks = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id).populate({
     path: "bookmarks",

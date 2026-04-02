@@ -6,7 +6,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { generateOtp } from "../utils/generateOtp.js";
 import { sendEmail } from "../utils/sendEmail.js";
 
-// ─── Forgot Password OTP email template ─────────────────────────────
+//Forgot Password OTP email template
 const buildForgotPasswordEmailHtml = (name, otp) => `
 <!DOCTYPE html>
 <html>
@@ -55,7 +55,7 @@ const buildForgotPasswordEmailHtml = (name, otp) => `
 </html>
 `;
 
-// ─── Forgot Password — Send OTP ──────────────────────────────────────
+//Forgot Password — Send OTP
 const sendForgotPasswordOtp = asyncHandler(async (req, res) => {
   const { email } = req.body;
   if (!email) throw new ApiError(400, "email is required");
@@ -86,7 +86,7 @@ const sendForgotPasswordOtp = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, { email: normalizedEmail }, "OTP sent to your email"));
 });
 
-// ─── Forgot Password — Verify OTP ────────────────────────────────────
+//Forgot Password — Verify OTP 
 const verifyForgotPasswordOtp = asyncHandler(async (req, res) => {
   const { email, otp } = req.body;
   if (!email || !otp) throw new ApiError(400, "email and otp are required");
@@ -103,7 +103,7 @@ const verifyForgotPasswordOtp = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, { resetToken }, "OTP verified. You may now reset your password."));
 });
 
-// ─── Forgot Password — Reset Password ────────────────────────────────
+//Forgot Password — Reset Password
 const resetPassword = asyncHandler(async (req, res) => {
   const { email, resetToken, newPassword } = req.body;
   if (!email || !resetToken || !newPassword)

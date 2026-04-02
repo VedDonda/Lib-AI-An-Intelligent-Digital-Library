@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Bookmark, BookOpen, User, Loader } from "lucide-react";
 import { getBookmarks } from "../lib/bookApi";
 import { useAuth } from "../context/AuthContext";
+import Navbar from "../components/Navbar";
 
 const BookmarksPage = () => {
     const { token } = useAuth();
@@ -25,17 +26,16 @@ const BookmarksPage = () => {
     }, [token]);
 
     return (
-        <div className="text-white">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div className="mb-8 flex items-center gap-3">
-                    <div className="p-2 bg-purple-500/15 rounded-lg">
-                        <Bookmark className="size-6 text-purple-400" />
-                    </div>
-                    <div>
-                        <h1 className="text-3xl font-bold tracking-tight">Bookmarks</h1>
-                        <p className="text-zinc-500 text-sm mt-1">Books you've saved for later.</p>
-                    </div>
-                </div>
+        <div className="text-white flex flex-col min-h-full">
+            <Navbar 
+                title="Bookmarks" 
+                subtitle="Books you've saved for later." 
+                // icon={Bookmark} 
+                // iconColor="text-purple-400" 
+                // iconBg="bg-purple-500/15" 
+            />
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 w-full flex-1">
+
 
                 {isLoading && (
                     <div className="flex justify-center py-32">

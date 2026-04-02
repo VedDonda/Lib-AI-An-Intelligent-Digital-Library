@@ -12,7 +12,7 @@ const cookieOptions = {
   secure: process.env.NODE_ENV === "production",
 };
 
-// ─── Beautiful OTP email template ───────────────────────────────────
+//Beautiful OTP email template
 const buildOtpEmailHtml = (name, otp) => `
 <!DOCTYPE html>
 <html>
@@ -65,7 +65,7 @@ const buildOtpEmailHtml = (name, otp) => `
 </html>
 `;
 
-// ─── Register ───────────────────────────────────────────────────────
+//Register
 const registerUser = asyncHandler(async (req, res) => {
   const { name, email, password, role } = req.body;
 
@@ -105,7 +105,7 @@ const registerUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(201, { email: normalizedEmail }, "OTP sent. Please verify to complete registration."));
 });
 
-// ─── Verify OTP ─────────────────────────────────────────────────────
+//Verify OTP
 const verifyOtp = asyncHandler(async (req, res) => {
   const { email, otp } = req.body;
 
@@ -139,7 +139,7 @@ const verifyOtp = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, createdUser, "Email verified. Account created successfully!"));
 });
 
-// ─── Resend OTP ─────────────────────────────────────────────────────
+//Resend OTP
 const resendOtp = asyncHandler(async (req, res) => {
   const { email } = req.body;
 
@@ -178,7 +178,7 @@ const resendOtp = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, { email: normalizedEmail }, "OTP resent successfully"));
 });
 
-// ─── Login ──────────────────────────────────────────────────────────
+//Login
 const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
@@ -227,7 +227,7 @@ const loginUser = asyncHandler(async (req, res) => {
     );
 });
 
-// ─── Logout ─────────────────────────────────────────────────────────
+//Logout
 const logoutUser = asyncHandler(async (req, res) => {
   // Clear refresh token from DB
   await User.findByIdAndUpdate(req.user._id, { refreshToken: "" });
@@ -239,7 +239,7 @@ const logoutUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "User logged out successfully"));
 });
 
-// ─── Refresh Access Token ───────────────────────────────────────────
+//Refresh Access Token 
 
 const refreshAccessToken = asyncHandler(async (req, res) => {
   const incomingRefreshToken = req.cookies?.refreshToken;

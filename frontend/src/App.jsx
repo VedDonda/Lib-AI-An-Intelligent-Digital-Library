@@ -11,6 +11,7 @@ import AdminDashboardPage from "./pages/AdminDashboardPage";
 import ProfilePage from "./pages/ProfilePage";
 import AppLayout from "./components/AppLayout";
 import BookmarksPage from "./pages/BookmarksPage";
+import BookQnAPage from "./pages/BookQnAPage";
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
           <Route path="/" element={<DashboardPage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/books/:id" element={<BookReaderPage />} />
+          <Route path="/books/:id/ask" element={<BookQnAPage />} />
 
           <Route
             path="/bookmarks"

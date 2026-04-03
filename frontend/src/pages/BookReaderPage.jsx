@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Document, Page, pdfjs } from "react-pdf";
-import { ChevronLeft, ChevronRight, Loader, ZoomIn, ZoomOut } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader, ZoomIn, ZoomOut, Sparkles } from "lucide-react";
 import BackButton from "../components/BackButton";
 import { getBook } from "../lib/bookApi";
 import "react-pdf/dist/Page/AnnotationLayer.css";
@@ -142,6 +142,17 @@ const BookReaderPage = () => {
                     >
                         <ChevronRight className="size-4" />
                     </button>
+
+                    <div className="w-px h-6 bg-zinc-800 mx-1" />
+
+                    <Link
+                        to={`/books/${id}/ask`}
+                        className="flex items-center gap-1.5 px-3 py-2 bg-purple-600/80 hover:bg-purple-500 rounded-lg text-xs font-medium text-white transition-colors"
+                        title="Ask this Book with AI"
+                    >
+                        <Sparkles className="size-3.5" />
+                        Ask AI
+                    </Link>
                 </div>
             </div>
 

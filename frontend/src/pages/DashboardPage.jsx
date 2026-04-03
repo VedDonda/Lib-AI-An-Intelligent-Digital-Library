@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Search, BookOpen, Loader, User, Trash2, Edit, Bookmark } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Search, BookOpen, Loader, User, Trash2, Edit, Bookmark, Sparkles } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import { getAllBooks, deleteBook, toggleBookmark, getBookmarks } from "../lib/bookApi";
 import { useAuth } from "../context/AuthContext";
 import Navbar from "../components/Navbar";
@@ -9,6 +9,7 @@ import EditBookModal from "../components/EditBookModal";
 
 const DashboardPage = () => {
     const { user, token } = useAuth();
+    const navigate = useNavigate();
     const [books, setBooks] = useState([]);
     const [search, setSearch] = useState("");
     const [isLoading, setIsLoading] = useState(true);
@@ -165,9 +166,9 @@ const DashboardPage = () => {
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: index * 0.04 }}
                                 >
-                                    <Link
-                                        to={`/books/${book._id}`}
-                                        className="group block bg-zinc-900/40 border border-zinc-800/60 rounded-2xl overflow-hidden hover:border-purple-500/30 hover:shadow-lg hover:shadow-purple-900/10 transition-all duration-300 relative"
+                                    <div
+                                        onClick={() => navigate(`/books/${book._id}`)}
+                                        className="group block bg-zinc-900/40 border border-zinc-800/60 rounded-2xl overflow-hidden hover:border-purple-500/30 hover:shadow-lg hover:shadow-purple-900/10 transition-all duration-300 relative cursor-pointer"
                                     >
                                         <div className="aspect-[3/4] bg-zinc-800 overflow-hidden relative">
                                             {book.coverImage ? (
@@ -183,7 +184,20 @@ const DashboardPage = () => {
                                                 </div>
                                             )}
                                             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
-                                                <span className="text-sm font-medium text-purple-300">Read Book →</span>
+                                                <div className="flex items-center justify-between w-full">
+                                                    <span className="text-sm font-medium text-purple-300">Read Book →</span>
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            navigate(`/books/${book._id}/ask`);
+                                                        }}
+                                                        className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-600/90 hover:bg-purple-500 rounded-lg text-xs font-medium text-white backdrop-blur-sm transition-colors"
+                                                        title="Ask this Book with AI"
+                                                    >
+                                                        <Sparkles className="size-3.5" />
+                                                        Ask AI
+                                                    </button>
+                                                </div>
                                             </div>
 
                                             {/* Bookmark button — always visible top-left */}
@@ -238,7 +252,7 @@ const DashboardPage = () => {
                                                 </button>
                                             </div>
                                         )}
-                                    </Link>
+                                    </div>
                                 </motion.div>
                             ))}
                         </div>

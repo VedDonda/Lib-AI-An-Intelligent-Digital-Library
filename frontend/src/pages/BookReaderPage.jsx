@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
 import { Document, Page, pdfjs } from "react-pdf";
-import { ChevronLeft, ChevronRight, Loader, ZoomIn, ZoomOut, Sparkles } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader, ZoomIn, ZoomOut, Sparkles, BookOpen } from "lucide-react";
 import { Panel, Group, Separator } from "react-resizable-panels";
 import BackButton from "../components/BackButton";
 import BookQnAComponent from "../components/BookQnAComponent";
-import { getBook } from "../lib/bookApi";
+import { getBook, addToHistory } from "../lib/bookApi";
+import { useAuth } from "../context/AuthContext";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 
@@ -14,6 +15,8 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/b
 const BookReaderPage = () => {
     const { id } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
+    const { token } = useAuth();
     const [book, setBook] = useState(null);
     const [numPages, setNumPages] = useState(null);
     const [pageNumber, setPageNumber] = useState(1);
@@ -22,7 +25,10 @@ const BookReaderPage = () => {
     const [error, setError] = useState("");
     const [pageInput, setPageInput] = useState("1");
     const [isPageLoading, setIsPageLoading] = useState(true);
-    const [isAiMode, setIsAiMode] = useState(false);
+    const [isAiMode, setIsAiMode] = useState(() => {
+        const params = new URLSearchParams(location.search);
+        return params.get("ask") === "true";
+    });
 
     useEffect(() => {
         setIsPageLoading(true);
@@ -40,7 +46,11 @@ const BookReaderPage = () => {
             }
         };
         fetchBook();
-    }, [id]);
+        
+        if (id && token) {
+            addToHistory(id, token).catch(console.error);
+        }
+    }, [id, token]);
 
     const onDocumentLoadSuccess = ({ numPages }) => {
         setNumPages(numPages);
@@ -93,74 +103,84 @@ const BookReaderPage = () => {
             <Group orientation="horizontal">
                 <Panel minSize={30} defaultSize={isAiMode ? 65 : 100}>
                     <div className="flex flex-col h-full bg-[#111111]">
-                        <div className="flex items-center justify-between px-4 h-16 shrink-0 bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-zinc-800/50">
-                <div className="flex items-center gap-3">
-                    <BackButton className="!static" onClick={() => navigate("/dashboard")} />
-                    <div>
-                        <h1 className="text-sm font-semibold leading-tight line-clamp-1">{book?.title}</h1>
-                        <p className="text-xs text-zinc-500">{book?.author}</p>
+                        <div className="flex items-center justify-between px-4 sm:px-6 h-16 shrink-0 bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-zinc-800/50 z-10 relative">
+                <div className="flex items-center gap-4">
+                    <BackButton className="!static bg-zinc-900/50 hover:bg-zinc-800 border border-zinc-800/60" onClick={() => navigate("/dashboard")} />
+                    <div className="h-8 w-px bg-zinc-800/60 hidden sm:block"></div>
+                    <div className="flex items-center gap-3">
+                        {book?.coverImage ? (
+                            <img src={book.coverImage} alt="Cover" className="w-8 h-10 rounded flex-shrink-0 object-cover border border-zinc-700/50 shadow-sm hidden sm:block" />
+                        ) : (
+                            <div className="w-8 h-10 rounded flex-shrink-0 bg-zinc-800 border border-zinc-700/50 shadow-sm hidden sm:flex items-center justify-center">
+                                <BookOpen className="size-4 text-zinc-500" />
+                            </div>
+                        )}
+                        <div>
+                            <h1 className="text-sm font-bold text-white leading-tight line-clamp-1 break-all max-w-[150px] md:max-w-xs">{book?.title || "Loading..."}</h1>
+                            <p className="text-[11px] text-purple-400 font-medium tracking-wide mt-0.5">{book?.author}</p>
+                        </div>
                     </div>
                 </div>
 
-                <div className="flex items-center gap-2">
-                    <button
-                        onClick={() => setScale((s) => Math.max(0.5, s - 0.2))}
-                        className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors"
-                        title="Zoom out"
-                    >
-                        <ZoomOut className="size-4" />
-                    </button>
-                    <span className="text-xs text-zinc-500 w-12 text-center">{Math.round(scale * 100)}%</span>
-                    <button
-                        onClick={() => setScale((s) => Math.min(3, s + 0.2))}
-                        className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors"
-                        title="Zoom in"
-                    >
-                        <ZoomIn className="size-4" />
-                    </button>
+                <div className="flex items-center gap-3">
+                    {/* Zoom Controls */}
+                    <div className="hidden md:flex items-center gap-1 bg-zinc-900/60 border border-zinc-800/60 rounded-xl p-1 shadow-inner">
+                        <button
+                            onClick={() => setScale((s) => Math.max(0.5, s - 0.2))}
+                            className="p-1.5 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors cursor-pointer"
+                            title="Zoom out"
+                        >
+                            <ZoomOut className="size-4" />
+                        </button>
+                        <span className="text-[11px] font-medium text-zinc-400 w-10 text-center select-none">{Math.round(scale * 100)}%</span>
+                        <button
+                            onClick={() => setScale((s) => Math.min(3, s + 0.2))}
+                            className="p-1.5 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors cursor-pointer"
+                            title="Zoom in"
+                        >
+                            <ZoomIn className="size-4" />
+                        </button>
+                    </div>
 
-                    <div className="w-px h-6 bg-zinc-800 mx-1" />
+                    {/* Page Controls */}
+                    <div className="flex items-center gap-1 bg-zinc-900/60 border border-zinc-800/60 rounded-xl p-1 shadow-inner">
+                        <button
+                            onClick={() => goToPage(pageNumber - 1)}
+                            disabled={pageNumber <= 1}
+                            className="p-1.5 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                        >
+                            <ChevronLeft className="size-4" />
+                        </button>
 
-                    <button
-                        onClick={() => goToPage(pageNumber - 1)}
-                        disabled={pageNumber <= 1}
-                        className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                    >
-                        <ChevronLeft className="size-4" />
-                    </button>
+                        <form onSubmit={handlePageInputSubmit} className="flex items-center gap-1.5 px-1">
+                            <input
+                                type="text"
+                                value={pageInput}
+                                onChange={(e) => setPageInput(e.target.value)}
+                                className="w-10 text-center bg-zinc-800 border border-zinc-700/50 rounded-md py-1 text-xs font-medium text-white focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/20 transition-all"
+                            />
+                            <span className="text-[11px] font-medium text-zinc-500 select-none">/ {numPages || "?"}</span>
+                        </form>
 
-                    <form onSubmit={handlePageInputSubmit} className="flex items-center gap-1.5">
-                        <input
-                            type="text"
-                            value={pageInput}
-                            onChange={(e) => setPageInput(e.target.value)}
-                            className="w-12 text-center bg-zinc-800 border border-zinc-700 rounded-md py-1 text-xs text-white focus:outline-none focus:border-purple-500"
-                        />
-                        <span className="text-xs text-zinc-500">/ {numPages || "?"}</span>
-                    </form>
+                        <button
+                            onClick={() => goToPage(pageNumber + 1)}
+                            disabled={pageNumber >= (numPages || 1)}
+                            className="p-1.5 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                        >
+                            <ChevronRight className="size-4" />
+                        </button>
+                    </div>
 
-                    <button
-                        onClick={() => goToPage(pageNumber + 1)}
-                        disabled={pageNumber >= (numPages || 1)}
-                        className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                    >
-                        <ChevronRight className="size-4" />
-                    </button>
-
-                    <div className="w-px h-6 bg-zinc-800 mx-1" />
-
-                    <button
-                        onClick={() => setIsAiMode(!isAiMode)}
-                        className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
-                            isAiMode
-                                ? "bg-zinc-800 text-purple-400 hover:bg-zinc-700"
-                                : "bg-purple-600/80 hover:bg-purple-500 text-white"
-                        }`}
-                        title="Ask this Book with AI"
-                    >
-                        <Sparkles className="size-3.5" />
-                        {isAiMode ? "Close AI" : "Ask AI"}
-                    </button>
+                    {!isAiMode && (
+                        <button
+                            onClick={() => setIsAiMode(true)}
+                            className="hidden sm:flex items-center gap-2 px-4 py-2 ml-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 rounded-xl text-xs font-bold text-white shadow-lg shadow-purple-900/20 transition-all hover:scale-105 active:scale-95 border border-purple-500/30 cursor-pointer"
+                            title="Ask this Book with AI"
+                        >
+                            <Sparkles className="size-4" />
+                            Ask AI
+                        </button>
+                    )}
                 </div>
             </div>
 
@@ -204,7 +224,7 @@ const BookReaderPage = () => {
                         <>
                             <Separator className="w-1.5 bg-zinc-800/50 hover:bg-purple-500/50 transition-colors cursor-col-resize active:bg-purple-500 z-20" />
                             <Panel minSize={20} defaultSize={35}>
-                                <BookQnAComponent bookId={id} book={book} onClose={() => setIsAiMode(false)} />
+                                <BookQnAComponent bookId={id} book={book} onClose={() => setIsAiMode(false)} onPageClick={goToPage} />
                             </Panel>
                         </>
                     )}

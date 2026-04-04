@@ -17,6 +17,19 @@ const otpSchema = new mongoose.Schema({
         enum: ["verify", "reset"],
         default: "verify",
     },
+    
+    pendingName: {
+        type: String,
+        default: null,
+    },
+    pendingPassword: {
+        type: String,
+        default: null,
+    },
+    pendingRole: {
+        type: String,
+        default: "student",
+    },
     resetToken: {
         type: String,
         default: null,

@@ -78,3 +78,34 @@ export const getBookmarks = async (token) => {
     });
     return handleResponse(response);
 };
+
+export const addToHistory = async (bookId, token) => {
+    const response = await fetch(`${API_BASE_URL}/users/history/${bookId}`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+    return handleResponse(response);
+};
+
+export const getReadHistory = async (token) => {
+    const response = await fetch(`${API_BASE_URL}/users/history`, {
+        credentials: "include",
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+    return handleResponse(response);
+};
+
+export const getUserUploads = async (token) => {
+    const response = await fetch(`${API_BASE_URL}/users/uploads`, {
+        credentials: "include",
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+    return handleResponse(response);
+};

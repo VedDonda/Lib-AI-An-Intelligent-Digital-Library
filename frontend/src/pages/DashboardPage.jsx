@@ -119,7 +119,7 @@ const DashboardPage = () => {
         <div className="text-white flex flex-col min-h-full">
             <Navbar 
                 title="Digital Library" 
-                subtitle="Browse and read books from your college library — anytime, anywhere." 
+                subtitle="Browse and read books from your college library - anytime, anywhere." 
             />
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 w-full flex-1">
 
@@ -189,7 +189,7 @@ const DashboardPage = () => {
                                                     <button
                                                         onClick={(e) => {
                                                             e.stopPropagation();
-                                                            navigate(`/books/${book._id}/ask`);
+                                                            navigate(`/books/${book._id}?ask=true`);
                                                         }}
                                                         className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-600/90 hover:bg-purple-500 rounded-lg text-xs font-medium text-white backdrop-blur-sm transition-colors"
                                                         title="Ask this Book with AI"

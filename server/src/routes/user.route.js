@@ -7,7 +7,7 @@ import {
   verifyOtp,
   resendOtp,
 } from "../controllers/auth.controller.js";
-import { getCurrentUser, librarianDashboard, toggleBookmark, getBookmarks } from "../controllers/user.controller.js";
+import { getCurrentUser, librarianDashboard, toggleBookmark, getBookmarks, addToHistory, getReadHistory, getUserUploads } from "../controllers/user.controller.js";
 import { sendForgotPasswordOtp, verifyForgotPasswordOtp, resetPassword } from "../controllers/password.controller.js";
 import { authorizeRoles, verifyJWT } from "../middlewares/auth.middleware.js";
 
@@ -28,5 +28,8 @@ router.post("/forgot-password/reset", resetPassword);
 
 router.post("/bookmark/:bookId", verifyJWT, toggleBookmark);
 router.get("/bookmarks", verifyJWT, getBookmarks);
+router.post("/history/:bookId", verifyJWT, addToHistory);
+router.get("/history", verifyJWT, getReadHistory);
+router.get("/uploads", verifyJWT, getUserUploads);
 
 export default router;

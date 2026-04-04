@@ -14,7 +14,7 @@ const Navbar = ({ title, subtitle, icon: Icon, iconColor, iconBg }) => {
                         <div className="flex flex-col justify-center">
                             <span className="text-lg font-bold tracking-tight text-white leading-tight">{title || "LibAI"}</span>
                             {subtitle && (
-                                <span className="text-[11px] text-zinc-400 leading-tight mt-0.5 max-w-sm truncate hidden sm:block">{subtitle}</span>
+                                <span className="text-sm font-medium text-zinc-400 leading-tight mt-0.5 max-w-md truncate hidden sm:block">{subtitle}</span>
                             )}
                         </div>
                     </div>

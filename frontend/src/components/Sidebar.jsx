@@ -75,10 +75,10 @@ const Sidebar = () => {
             <div className={`flex items-center h-16 border-b border-zinc-800/50 px-2 ${expanded ? "justify-start px-4" : "justify-center"}`}>
                 <Link to="/dashboard" className="flex items-center gap-2.5 group" title={!expanded ? "LibAI" : undefined}>
                     <div className="bg-purple-500/15 p-2 rounded-lg group-hover:bg-purple-500/25 transition-colors flex-shrink-0">
-                        <Library className="size-5 text-purple-400" />
+                        <Library className="size-6 text-purple-400" />
                     </div>
                     {expanded && (
-                        <span className="text-lg font-bold tracking-wide text-white overflow-hidden whitespace-nowrap">LibAI</span>
+                        <span className="text-2xl font-black tracking-wide text-white overflow-hidden whitespace-nowrap">LibAI</span>
                     )}
                 </Link>
             </div>

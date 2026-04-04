@@ -46,6 +46,18 @@ const userSchema = new mongoose.Schema(
         ref: "Book",
       },
     ],
+    readHistory: [
+      {
+        book: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Book",
+        },
+        viewedAt: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
   },
   { timestamps: true }
 );

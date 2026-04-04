@@ -43,6 +43,11 @@ def is_book_ingested(book_id: str) -> bool:
                 field_name="metadata.book_id",
                 field_schema=models.PayloadSchemaType.KEYWORD,
             )
+            client.create_payload_index(
+                collection_name="books",
+                field_name="metadata.page",
+                field_schema=models.PayloadSchemaType.INTEGER,
+            )
         except Exception:
             pass
             
@@ -107,6 +112,11 @@ def create_vector_store(book_id: str, chunks: List[Document]) -> int:
             field_name="metadata.book_id",
             field_schema=models.PayloadSchemaType.KEYWORD,
         )
+        client.create_payload_index(
+            collection_name="books",
+            field_name="metadata.page",
+            field_schema=models.PayloadSchemaType.INTEGER,
+        )
     except Exception:
         pass
 
@@ -114,9 +124,9 @@ def create_vector_store(book_id: str, chunks: List[Document]) -> int:
     return len(chunks)
 
 
-def similarity_search(book_id: str, query: str, k: int = 5) -> List[Document]:
+def similarity_search(book_id: str, query: str, k: int = 5, target_pages: List[int] = None) -> List[Document]:
     """
-    Search the Qdrant index for the most relevant chunks, filtered by book_id.
+    Search the Qdrant index for the most relevant chunks, filtered by book_id and optionally target_pages.
     """
     qdrant = QdrantVectorStore.from_existing_collection(
         embedding=embeddings,
@@ -125,17 +135,29 @@ def similarity_search(book_id: str, query: str, k: int = 5) -> List[Document]:
         api_key=settings.QDRANT_API_KEY
     )
 
-    # Note: Langchain Qdrant stores metadata in `metadata` field
-    filter = models.Filter(
-        must=[
+    filter_conditions = [
+        models.FieldCondition(
+            key="metadata.book_id",
+            match=models.MatchValue(value=book_id)
+        )
+    ]
+    
+    if target_pages:
+        filter_conditions.append(
             models.FieldCondition(
-                key="metadata.book_id",
-                match=models.MatchValue(value=book_id)
+                key="metadata.page",
+                match=models.MatchAny(any=target_pages)
             )
-        ]
-    )
+        )
+        # Increase limit drastically so we grab the entire page(s) not just a few chunks
+        k = max(k, len(target_pages) * 20)
 
-    results = qdrant.similarity_search(query, k=k, filter=filter)
+    filter = models.Filter(must=filter_conditions)
+
+    # Empty queries will fail in some vector engines, provide a fallback "content" query if routing isolated pages
+    search_query = query if query.strip() else "content"
+    
+    results = qdrant.similarity_search(search_query, k=k, filter=filter)
 
     pages = sorted(set(doc.metadata.get("page", 0) for doc in results))
     print(f"Found {len(results)} relevant chunks from pages: {pages} for book {book_id}")

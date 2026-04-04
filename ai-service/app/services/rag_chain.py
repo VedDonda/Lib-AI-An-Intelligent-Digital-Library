@@ -5,10 +5,11 @@ Orchestrates the retrieval + LLM generation pipeline using LangChain and Gemini.
 
 from typing import List, Optional
 import os
+import json
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.prompts import PromptTemplate
 from langchain.schema import Document
-from app.prompts import QA_SYSTEM_PROMPT
+from app.prompts import QA_SYSTEM_PROMPT, QUERY_PLANNER_PROMPT
 from app.services.vectorstore import similarity_search
 from app.core.config import settings
 
@@ -55,6 +56,31 @@ def format_context(documents: List[Document]) -> str:
     return "\n\n---\n\n".join(context_parts)
 
 
+async def get_search_params(llm, question: str) -> dict:
+    """Uses the LLM to parse the user's question into searchable parameters."""
+    prompt_template = PromptTemplate(
+        input_variables=["question"],
+        template=QUERY_PLANNER_PROMPT
+    )
+    formatted = prompt_template.format(question=question)
+    response = await llm.ainvoke(formatted)
+    text = response.content.strip()
+    
+    # Strip markdown code blocks if the LLM adds them
+    if text.startswith("```json"):
+        text = text[7:]
+    elif text.startswith("```"):
+        text = text[3:]
+    if text.endswith("```"):
+        text = text[:-3]
+        
+    try:
+        return json.loads(text.strip())
+    except Exception as e:
+        print(f"Failed to parse query planner JSON: {e}")
+        return {"semantic_query": question, "target_pages": []}
+
+
 async def get_answer(
     book_id: str,
     question: str,
@@ -62,20 +88,25 @@ async def get_answer(
 ) -> dict:
     """
     Main RAG pipeline:
-    1. Retrieve relevant chunks from FAISS
-    2. Build prompt with context + question + history
-    3. Send to Gemini and return the answer
+    1. Agentic Planner decides search strategy
+    2. Retrieve relevant chunks from Vector DB (with optional metadata filtering)
+    3. Send to Gemini and return the answer (with general knowledge fallback)
     """
-    # Step 1: Retrieve relevant chunks
-    relevant_docs = similarity_search(book_id, question, k=5)
+    llm = get_llm()
+    
+    # Step 1: LLM Planner decides how to search
+    params = await get_search_params(llm, question)
+    semantic_query = params.get("semantic_query", "")
+    target_pages = params.get("target_pages", [])
+    
+    # Fallback to the full question if everything is completely empty
+    if not semantic_query.strip() and not target_pages:
+        semantic_query = question
 
-    if not relevant_docs:
-        return {
-            "answer": "I couldn't find any relevant information in this book for your question. Please try a different question.",
-            "sourcePages": []
-        }
+    # Step 2: Retrieve relevant chunks dynamically based on the plan
+    relevant_docs = similarity_search(book_id, semantic_query, k=5, target_pages=target_pages)
 
-    # Step 2: Format context and build prompt
+    # Step 3: Format context and build prompt
     context = format_context(relevant_docs)
     history_str = format_chat_history(chat_history)
 
@@ -90,8 +121,8 @@ async def get_answer(
         question=question
     )
     print(formatted_prompt)
-    # Step 3: Get answer from Stable Gemini API
-    llm = get_llm()
+    # Step 4: Get answer from Stable Gemini API
+    # The llm object is already retrieved above
     response = await llm.ainvoke(formatted_prompt)
     answer_text = response.content
 

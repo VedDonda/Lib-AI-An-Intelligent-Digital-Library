@@ -2,7 +2,9 @@ import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Document, Page, pdfjs } from "react-pdf";
 import { ChevronLeft, ChevronRight, Loader, ZoomIn, ZoomOut, Sparkles } from "lucide-react";
+import { Panel, Group, Separator } from "react-resizable-panels";
 import BackButton from "../components/BackButton";
+import BookQnAComponent from "../components/BookQnAComponent";
 import { getBook } from "../lib/bookApi";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
@@ -20,6 +22,7 @@ const BookReaderPage = () => {
     const [error, setError] = useState("");
     const [pageInput, setPageInput] = useState("1");
     const [isPageLoading, setIsPageLoading] = useState(true);
+    const [isAiMode, setIsAiMode] = useState(false);
 
     useEffect(() => {
         setIsPageLoading(true);
@@ -86,10 +89,11 @@ const BookReaderPage = () => {
     }
 
     return (
-        <div
-            className="flex flex-col h-screen bg-[#0a0a0a] text-white"
-        >
-            <div className="flex items-center justify-between px-4 h-16 bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-zinc-800/50">
+        <div className="flex h-screen bg-[#0a0a0a] text-white overflow-hidden">
+            <Group orientation="horizontal">
+                <Panel minSize={30} defaultSize={isAiMode ? 65 : 100}>
+                    <div className="flex flex-col h-full bg-[#111111]">
+                        <div className="flex items-center justify-between px-4 h-16 shrink-0 bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-zinc-800/50">
                 <div className="flex items-center gap-3">
                     <BackButton className="!static" onClick={() => navigate("/dashboard")} />
                     <div>
@@ -145,50 +149,66 @@ const BookReaderPage = () => {
 
                     <div className="w-px h-6 bg-zinc-800 mx-1" />
 
-                    <Link
-                        to={`/books/${id}/ask`}
-                        className="flex items-center gap-1.5 px-3 py-2 bg-purple-600/80 hover:bg-purple-500 rounded-lg text-xs font-medium text-white transition-colors"
+                    <button
+                        onClick={() => setIsAiMode(!isAiMode)}
+                        className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
+                            isAiMode
+                                ? "bg-zinc-800 text-purple-400 hover:bg-zinc-700"
+                                : "bg-purple-600/80 hover:bg-purple-500 text-white"
+                        }`}
                         title="Ask this Book with AI"
                     >
                         <Sparkles className="size-3.5" />
-                        Ask AI
-                    </Link>
+                        {isAiMode ? "Close AI" : "Ask AI"}
+                    </button>
                 </div>
             </div>
 
-            <div className="flex-1 overflow-auto flex justify-center py-6 px-4 bg-[#111111] relative">
-                {isPageLoading && (
-                    <div className="absolute inset-0 z-10 flex items-center justify-center bg-[#111111]">
-                        <Loader className="size-8 text-purple-400 animate-spin" />
+                        <div className="flex-1 overflow-auto flex justify-center py-6 px-4 relative">
+                            {isPageLoading && (
+                                <div className="absolute inset-0 z-10 flex items-center justify-center bg-[#111111]/80 backdrop-blur-sm">
+                                    <Loader className="size-8 text-purple-400 animate-spin" />
+                                </div>
+                            )}
+                            {book?.pdfUrl && (
+                                <Document
+                                    file={book.pdfUrl}
+                                    onLoadSuccess={onDocumentLoadSuccess}
+                                    loading={
+                                        <div className="flex items-center justify-center py-32">
+                                            <Loader className="size-8 text-purple-400 animate-spin" />
+                                        </div>
+                                    }
+                                    error={
+                                        <div className="text-center py-32">
+                                            <p className="text-red-400 mb-2">Failed to load PDF</p>
+                                            <p className="text-xs text-zinc-600">The file may be corrupted or inaccessible.</p>
+                                        </div>
+                                    }
+                                >
+                                    <Page
+                                        pageNumber={pageNumber}
+                                        scale={scale}
+                                        className="shadow-2xl shadow-black/50 rounded-lg overflow-hidden"
+                                        renderAnnotationLayer={true}
+                                        renderTextLayer={true}
+                                        onLoadSuccess={() => setIsPageLoading(false)}
+                                    />
+                                </Document>
+                            )}
+                        </div>
                     </div>
-                )}
-                {book?.pdfUrl && (
-                    <Document
-                        file={book.pdfUrl}
-                        onLoadSuccess={onDocumentLoadSuccess}
-                        loading={
-                            <div className="flex items-center justify-center py-32">
-                                <Loader className="size-8 text-purple-400 animate-spin" />
-                            </div>
-                        }
-                        error={
-                            <div className="text-center py-32">
-                                <p className="text-red-400 mb-2">Failed to load PDF</p>
-                                <p className="text-xs text-zinc-600">The file may be corrupted or inaccessible.</p>
-                            </div>
-                        }
-                    >
-                        <Page
-                            pageNumber={pageNumber}
-                            scale={scale}
-                            className="shadow-2xl shadow-black/50 rounded-lg overflow-hidden"
-                            renderAnnotationLayer={true}
-                            renderTextLayer={true}
-                            onLoadSuccess={() => setIsPageLoading(false)}
-                        />
-                    </Document>
-                )}
-            </div>
+                </Panel>
+
+                    {isAiMode && (
+                        <>
+                            <Separator className="w-1.5 bg-zinc-800/50 hover:bg-purple-500/50 transition-colors cursor-col-resize active:bg-purple-500 z-20" />
+                            <Panel minSize={20} defaultSize={35}>
+                                <BookQnAComponent bookId={id} book={book} onClose={() => setIsAiMode(false)} />
+                            </Panel>
+                        </>
+                    )}
+                </Group>
         </div>
     );
 };

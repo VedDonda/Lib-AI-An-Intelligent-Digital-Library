@@ -10,6 +10,7 @@ import {
     LogIn,
     Bookmark,
     Library,
+    NotebookPen,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
@@ -59,6 +60,13 @@ const Sidebar = () => {
             to: "/bookmarks",
             show: !!user,
         },
+        {
+            icon: NotebookPen,
+            label: "Notes",
+            to: "/notes",
+            show: !!user,
+            // accent: "amber",
+        },
     ];
 
     const activeItems = navItems.filter((i) => i.show);
@@ -92,6 +100,10 @@ const Sidebar = () => {
                             ? isActive
                                 ? "bg-rose-500/20 text-rose-300 border border-rose-500/30"
                                 : "text-zinc-400 hover:bg-rose-500/10 hover:text-rose-300"
+                            : accent === "amber"
+                            ? isActive
+                                ? "bg-amber-500/20 text-amber-300 border border-amber-500/30"
+                                : "text-zinc-400 hover:bg-amber-500/10 hover:text-amber-300"
                             : isActive
                             ? "bg-purple-500/20 text-purple-300 border border-purple-500/30"
                             : "text-zinc-400 hover:bg-zinc-800 hover:text-white";

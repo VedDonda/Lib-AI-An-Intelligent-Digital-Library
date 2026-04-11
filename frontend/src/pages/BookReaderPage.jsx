@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
 import { Document, Page, pdfjs } from "react-pdf";
-import { ChevronLeft, ChevronRight, Loader, ZoomIn, ZoomOut, Sparkles, BookOpen } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader, ZoomIn, ZoomOut, Sparkles, BookOpen, NotebookPen } from "lucide-react";
 import { Panel, Group, Separator } from "react-resizable-panels";
 import BackButton from "../components/BackButton";
 import BookQnAComponent from "../components/BookQnAComponent";
+import BookNotesComponent from "../components/BookNotesComponent";
 import { getBook, addToHistory } from "../lib/bookApi";
 import { useAuth } from "../context/AuthContext";
 import "react-pdf/dist/Page/AnnotationLayer.css";
@@ -29,6 +30,7 @@ const BookReaderPage = () => {
         const params = new URLSearchParams(location.search);
         return params.get("ask") === "true";
     });
+    const [isNotesMode, setIsNotesMode] = useState(false);
 
     useEffect(() => {
         setIsPageLoading(true);
@@ -101,7 +103,7 @@ const BookReaderPage = () => {
     return (
         <div className="flex h-screen bg-[#0a0a0a] text-white overflow-hidden">
             <Group orientation="horizontal">
-                <Panel minSize={30} defaultSize={isAiMode ? 65 : 100}>
+                <Panel minSize={25} defaultSize={isAiMode && isNotesMode ? 45 : (isAiMode || isNotesMode) ? 60 : 100}>
                     <div className="flex flex-col h-full bg-[#111111]">
                         <div className="flex items-center justify-between px-4 sm:px-6 h-16 shrink-0 bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-zinc-800/50 z-10 relative">
                 <div className="flex items-center gap-4">
@@ -181,6 +183,16 @@ const BookReaderPage = () => {
                             Ask AI
                         </button>
                     )}
+                    {!isNotesMode && (
+                        <button
+                            onClick={() => setIsNotesMode(true)}
+                            className="hidden sm:flex items-center gap-2 px-4 py-2 ml-1 bg-zinc-900/60 border border-zinc-700/60 hover:border-indigo-500/40 hover:bg-zinc-800/60 rounded-xl text-xs font-bold text-zinc-300 hover:text-white shadow-lg transition-all hover:scale-105 active:scale-95 cursor-pointer"
+                            title="Open Notes"
+                        >
+                            <NotebookPen className="size-4" />
+                            Notes
+                        </button>
+                    )}
                 </div>
             </div>
 
@@ -225,6 +237,14 @@ const BookReaderPage = () => {
                             <Separator className="w-1.5 bg-zinc-800/50 hover:bg-purple-500/50 transition-colors cursor-col-resize active:bg-purple-500 z-20" />
                             <Panel minSize={20} defaultSize={35}>
                                 <BookQnAComponent bookId={id} book={book} onClose={() => setIsAiMode(false)} onPageClick={goToPage} />
+                            </Panel>
+                        </>
+                    )}
+                    {isNotesMode && (
+                        <>
+                            <Separator className="w-1.5 bg-zinc-800/50 hover:bg-amber-500/50 transition-colors cursor-col-resize active:bg-amber-500 z-20" />
+                            <Panel minSize={20} defaultSize={35}>
+                                <BookNotesComponent bookId={id} book={book} onClose={() => setIsNotesMode(false)} />
                             </Panel>
                         </>
                     )}

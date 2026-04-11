@@ -11,6 +11,7 @@ import AdminDashboardPage from "./pages/AdminDashboardPage";
 import ProfilePage from "./pages/ProfilePage";
 import AppLayout from "./components/AppLayout";
 import BookmarksPage from "./pages/BookmarksPage";
+import NotesPage from "./pages/NotesPage";
 
 function App() {
   return (
@@ -60,6 +61,15 @@ function App() {
             element={
               <ProtectedRoute>
                 <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/notes"
+            element={
+              <ProtectedRoute>
+                <NotesPage />
               </ProtectedRoute>
             }
           />

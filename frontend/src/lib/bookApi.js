@@ -109,3 +109,56 @@ export const getUserUploads = async (token) => {
     });
     return handleResponse(response);
 };
+
+// ─── Notes API ────────────────────────────────────────────────────────────────
+
+export const getNotes = async (bookId, token) => {
+    const response = await fetch(`${API_BASE_URL}/notes?bookId=${bookId}`, {
+        credentials: "include",
+        headers: { Authorization: `Bearer ${token}` },
+    });
+    return handleResponse(response);
+};
+
+export const getAllNotes = async (token) => {
+    const response = await fetch(`${API_BASE_URL}/notes/all`, {
+        credentials: "include",
+        headers: { Authorization: `Bearer ${token}` },
+    });
+    return handleResponse(response);
+};
+
+export const createNote = async (data, token) => {
+    const response = await fetch(`${API_BASE_URL}/notes`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(data),
+    });
+    return handleResponse(response);
+};
+
+export const updateNote = async (id, data, token) => {
+    const response = await fetch(`${API_BASE_URL}/notes/${id}`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(data),
+    });
+    return handleResponse(response);
+};
+
+export const deleteNote = async (id, token) => {
+    const response = await fetch(`${API_BASE_URL}/notes/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+        headers: { Authorization: `Bearer ${token}` },
+    });
+    return handleResponse(response);
+};

@@ -29,10 +29,12 @@ app.use(cookieParser())
 import userRouter from './routes/user.route.js'
 import bookRouter from './routes/book.route.js'
 import adminRouter from './routes/admin.route.js'
+import noteRouter from './routes/note.route.js'
 
 app.use("/users", userRouter)
 app.use("/books", bookRouter)
 app.use("/admin", adminRouter)
+app.use("/notes", noteRouter)
 
 app.use((req, res, next) => {
     next(new ApiError(404, "Route not found"))

@@ -115,20 +115,20 @@ const BookQnAComponent = ({ bookId, book, onClose, onPageClick }) => {
 
     return (
         <div className="flex flex-col h-full bg-[#050505] text-white border-l border-zinc-800/50 relative">
-            <div className="flex items-center justify-between px-5 py-4 bg-[#0a0a0a]/90 backdrop-blur-xl border-b border-zinc-800/60 z-10 sticky top-0 shrink-0">
+            <div className="flex items-center justify-between px-5 h-16 bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-zinc-800/50 z-10 sticky top-0 shrink-0">
                 <div className="flex items-center gap-3">
-                    <div className="p-2 bg-gradient-to-br from-purple-500/20 to-indigo-500/20 rounded-xl border border-purple-500/30">
+                    <div className="p-2 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 rounded-xl border border-indigo-500/30">
                         <Sparkles className="size-4 text-purple-400" />
                     </div>
                     <div>
-                        <h2 className="text-sm font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-indigo-400">Ask AI</h2>
-                        <p className="text-[10px] text-zinc-500 font-medium">Book knowledge assistant</p>
+                        <h2 className="text-sm font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">Ask AI</h2>
+                        <p className="text-[11px] text-purple-400 font-medium tracking-wide mt-0.5 truncate max-w-[120px]">Book knowledge assistant</p>
                     </div>
                 </div>
                 {onClose && (
                     <button
                         onClick={onClose}
-                        className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-xl transition-all cursor-pointer"
+                        className="p-1.5 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-all cursor-pointer shadow-none"
                         title="Close AI Chat"
                     >
                         <X className="size-4" />

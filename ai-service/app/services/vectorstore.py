@@ -13,13 +13,19 @@ from qdrant_client import QdrantClient
 from qdrant_client.http import models
 
 from app.core.config import settings
+_embeddings = None
 
-# Initialize Hugging Face Local Embeddings - This downloads the model locally on first run!
-# print("Initializing Hugging Face Local Embeddings...")
-embeddings = HuggingFaceEmbeddings(
-    model_name="sentence-transformers/all-MiniLM-L6-v2"
-)
-# print("Embeddings loaded locally: sentence-transformers/all-MiniLM-L6-v2")
+
+def get_embeddings() -> HuggingFaceEmbeddings:
+    """Return the shared embeddings model, initializing it on first call."""
+    global _embeddings
+    if _embeddings is None:
+        print("Initializing HuggingFace embeddings (first use)...")
+        _embeddings = HuggingFaceEmbeddings(
+            model_name="sentence-transformers/all-MiniLM-L6-v2"
+        )
+        print("Embeddings ready: sentence-transformers/all-MiniLM-L6-v2")
+    return _embeddings
 
 
 def get_qdrant_client() -> QdrantClient:
@@ -81,25 +87,22 @@ def chunk_documents(documents: List[Document]) -> List[Document]:
     )
 
     chunks = text_splitter.split_documents(documents)
-    # print(f"Split into {len(chunks)} chunks (chunk_size=1000, overlap=200)")
+    print(f"Split into {len(chunks)} chunks (chunk_size=1000, overlap=200)")
     return chunks
 
 
 def create_vector_store(book_id: str, chunks: List[Document]) -> int:
-    """
-    Tag chunks with book_id and insert them into Qdrant.
-    """
+    """Tag chunks with book_id and insert them into Qdrant."""
     if not chunks:
         print("No chunks to index")
         return 0
 
-    # Ensure every chunk has the book_id in its metadata
     for chunk in chunks:
         chunk.metadata["book_id"] = book_id
 
     QdrantVectorStore.from_documents(
         documents=chunks,
-        embedding=embeddings,
+        embedding=get_embeddings(),
         url=settings.QDRANT_URL,
         api_key=settings.QDRANT_API_KEY,
         collection_name="books"
@@ -120,16 +123,14 @@ def create_vector_store(book_id: str, chunks: List[Document]) -> int:
     except Exception:
         pass
 
-    # print(f"Qdrant index updated for book: {book_id} ({len(chunks)} vectors)")
+    print(f"Qdrant index updated for book: {book_id} ({len(chunks)} vectors)")
     return len(chunks)
 
 
 def similarity_search(book_id: str, query: str, k: int = 5, target_pages: List[int] = None) -> List[Document]:
-    """
-    Search the Qdrant index for the most relevant chunks, filtered by book_id and optionally target_pages.
-    """
+    """Search the Qdrant index for the most relevant chunks."""
     qdrant = QdrantVectorStore.from_existing_collection(
-        embedding=embeddings,
+        embedding=get_embeddings(),
         collection_name="books",
         url=settings.QDRANT_URL,
         api_key=settings.QDRANT_API_KEY
@@ -149,17 +150,14 @@ def similarity_search(book_id: str, query: str, k: int = 5, target_pages: List[i
                 match=models.MatchAny(any=target_pages)
             )
         )
-        # Increase limit drastically so we grab the entire page(s) not just a few chunks
         k = max(k, len(target_pages) * 20)
 
     filter = models.Filter(must=filter_conditions)
-
-    # Empty queries will fail in some vector engines, provide a fallback "content" query if routing isolated pages
     search_query = query if query.strip() else "content"
     
     results = qdrant.similarity_search(search_query, k=k, filter=filter)
 
     pages = sorted(set(doc.metadata.get("page", 0) for doc in results))
-    # print(f"Found {len(results)} relevant chunks from pages: {pages} for book {book_id}")
+    print(f"Found {len(results)} relevant chunks from pages: {pages} for book {book_id}")
 
     return results

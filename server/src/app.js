@@ -5,19 +5,9 @@ import { ApiError } from "./utils/ApiError.js"
 
 const app = express();
 
-const allowedOrigins = (process.env.CORS_ORIGIN || "http://localhost:5173")
-    .split(",")
-    .map((origin) => origin.trim())
-    .filter(Boolean)
-
 app.use(cors({
-    origin: (origin, callback) => {
-        if (!origin) return callback(null, true)
-        if (allowedOrigins.includes("*") || allowedOrigins.includes(origin)) {
-            return callback(null, true)
-        }
-        return callback(new ApiError(403, "CORS blocked for this origin"))
-    },
+    origin: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     credentials: true
 }))
 

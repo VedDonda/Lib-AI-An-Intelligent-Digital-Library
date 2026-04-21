@@ -30,9 +30,9 @@ def run_ingestion_pipeline(book_id: str, pdf_url: str):
     """
     local_path = None
     try:
-        print(f"\n{'='*60}")
-        print(f"Starting ingestion for book: {book_id}")
-        print(f"{'='*60}")
+        # print(f"\n{'='*60}")
+        # print(f"Starting ingestion for book: {book_id}")
+        # print(f"{'='*60}")
 
         # 1. Download PDF from Cloudinary
         local_path = download_pdf(pdf_url)
@@ -55,9 +55,9 @@ def run_ingestion_pipeline(book_id: str, pdf_url: str):
         # 6. Create FAISS index
         total_chunks = create_vector_store(book_id, chunks)
 
-        print(f"{'='*60}")
-        print(f"Ingestion complete for book: {book_id} ({total_chunks} chunks)")
-        print(f"{'='*60}\n")
+        # print(f"{'='*60}")
+        # print(f"Ingestion complete for book: {book_id} ({total_chunks} chunks)")
+        # print(f"{'='*60}\n")
 
     except Exception as e:
         print(f"Ingestion failed for book {book_id}: {e}")

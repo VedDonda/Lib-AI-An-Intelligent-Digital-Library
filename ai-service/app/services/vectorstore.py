@@ -15,11 +15,11 @@ from qdrant_client.http import models
 from app.core.config import settings
 
 # Initialize Hugging Face Local Embeddings - This downloads the model locally on first run!
-print("Initializing Hugging Face Local Embeddings...")
+# print("Initializing Hugging Face Local Embeddings...")
 embeddings = HuggingFaceEmbeddings(
     model_name="sentence-transformers/all-MiniLM-L6-v2"
 )
-print("Embeddings loaded locally: sentence-transformers/all-MiniLM-L6-v2")
+# print("Embeddings loaded locally: sentence-transformers/all-MiniLM-L6-v2")
 
 
 def get_qdrant_client() -> QdrantClient:
@@ -81,7 +81,7 @@ def chunk_documents(documents: List[Document]) -> List[Document]:
     )
 
     chunks = text_splitter.split_documents(documents)
-    print(f"Split into {len(chunks)} chunks (chunk_size=1000, overlap=200)")
+    # print(f"Split into {len(chunks)} chunks (chunk_size=1000, overlap=200)")
     return chunks
 
 
@@ -120,7 +120,7 @@ def create_vector_store(book_id: str, chunks: List[Document]) -> int:
     except Exception:
         pass
 
-    print(f"Qdrant index updated for book: {book_id} ({len(chunks)} vectors)")
+    # print(f"Qdrant index updated for book: {book_id} ({len(chunks)} vectors)")
     return len(chunks)
 
 
@@ -160,6 +160,6 @@ def similarity_search(book_id: str, query: str, k: int = 5, target_pages: List[i
     results = qdrant.similarity_search(search_query, k=k, filter=filter)
 
     pages = sorted(set(doc.metadata.get("page", 0) for doc in results))
-    print(f"Found {len(results)} relevant chunks from pages: {pages} for book {book_id}")
+    # print(f"Found {len(results)} relevant chunks from pages: {pages} for book {book_id}")
 
     return results

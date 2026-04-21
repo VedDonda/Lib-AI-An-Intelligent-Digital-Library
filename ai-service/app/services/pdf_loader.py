@@ -23,7 +23,7 @@ def download_pdf(pdf_url: str) -> str:
             temp_file.write(chunk)
         temp_file.close()
 
-        print(f"PDF downloaded to: {temp_file.name}")
+        # print(f"PDF downloaded to: {temp_file.name}")
         return temp_file.name
 
     except Exception as e:
@@ -60,7 +60,7 @@ def extract_text_from_pdf(pdf_path: str) -> List[Document]:
                 )
 
         doc.close()
-        print(f"Extracted text from {len(documents)} pages")
+        # print(f"Extracted text from {len(documents)} pages")
 
     except Exception as e:
         print(f"Error extracting text: {e}")
@@ -102,7 +102,7 @@ def extract_images_from_pdf(pdf_path: str) -> List[Dict]:
                         })
 
         doc.close()
-        print(f"Extracted {len(images)} significant images from PDF")
+        # print(f"Extracted {len(images)} significant images from PDF")
 
     except Exception as e:
         print(f"Image extraction failed (non-fatal): {e}")
@@ -115,6 +115,6 @@ def cleanup_temp_file(file_path: str):
     try:
         if os.path.exists(file_path):
             os.remove(file_path)
-            print(f"Cleaned up temp file: {file_path}")
+            # print(f"Cleaned up temp file: {file_path}")
     except Exception as e:
         print(f"Failed to clean up {file_path}: {e}")

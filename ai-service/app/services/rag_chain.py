@@ -120,7 +120,7 @@ async def get_answer(
         chat_history=history_str,
         question=question
     )
-    print(formatted_prompt)
+    # print(formatted_prompt)
     # Step 4: Get answer from Stable Gemini API
     # The llm object is already retrieved above
     response = await llm.ainvoke(formatted_prompt)

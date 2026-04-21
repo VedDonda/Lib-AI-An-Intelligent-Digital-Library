@@ -29,6 +29,8 @@ app.add_middleware(
         "http://localhost:5173",  # Vite dev server
         "http://localhost:8000",  # Node.js backend
         "http://localhost:3000",  # Alternative frontend port
+        "https://lib-ai-library.vercel.app",  # Vercel production
+        *([o.strip() for o in os.getenv("ALLOWED_ORIGINS", "").split(",") if o.strip()]),
     ],
     allow_credentials=True,
     allow_methods=["*"],

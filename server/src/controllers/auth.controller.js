@@ -7,9 +7,12 @@ import { generateOtp } from "../utils/generateOtp.js";
 import { sendEmail } from "../utils/sendEmail.js";
 import jwt from "jsonwebtoken";
 
+const isProduction = process.env.NODE_ENV === "production";
+
 const cookieOptions = {
   httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
+  secure: isProduction,           // must be true for SameSite=None
+  sameSite: isProduction ? "none" : "lax", // cross-origin (Vercel→Render) requires SameSite=None
 };
 
 //Beautiful OTP email template

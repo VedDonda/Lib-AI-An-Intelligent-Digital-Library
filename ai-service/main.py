@@ -22,19 +22,23 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# CORS — allow requests from React frontend and Node backend
+# Build allowed origins list — hardcoded + optional extras from env
+_extra = [o.strip() for o in os.getenv("ALLOWED_ORIGINS", "").split(",") if o.strip()]
+ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "http://localhost:8000",
+    "https://lib-ai-library.vercel.app",
+] + _extra
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",  # Vite dev server
-        "http://localhost:8000",  # Node.js backend
-        "http://localhost:3000",  # Alternative frontend port
-        "https://lib-ai-library.vercel.app",  # Vercel production
-        *([o.strip() for o in os.getenv("ALLOWED_ORIGINS", "").split(",") if o.strip()]),
-    ],
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization", "Accept", "Origin", "X-Requested-With"],
+    expose_headers=["*"],
+    max_age=3600,
 )
 
 # Mount API routes under /api/ai

@@ -8,14 +8,11 @@ requests==2.32.3
 pydantic==2.11.1
 pydantic-settings==2.9.1
 
-
 # PDF parsing
-
 pymupdf==1.25.5
 
 # ── LangChain ecosystem ────────────────────────────────────────────────────────
-# ALL packages MUST be pinned together. Without pins, pip backtracks through
-# hundreds of versions and the build times out (as seen in the Render build log).
+# ALL packages MUST be pinned together to avoid pip backtracking timeouts.
 langchain==0.3.25
 langchain-community==0.3.24
 langchain-core==0.3.84
@@ -25,8 +22,9 @@ langchain-google-genai==2.1.12
 langchain-huggingface==0.1.2
 langchain-qdrant==0.2.0
 
-# Vector store client
-qdrant-client==1.14.2
+# Vector store client — MUST match Qdrant Cloud server version (1.17.x)
+# Old 1.14.2 caused: "client version incompatible with server version 1.17.1"
+qdrant-client==1.17.1
 
 # Embeddings / ML
 sentence-transformers==3.4.1

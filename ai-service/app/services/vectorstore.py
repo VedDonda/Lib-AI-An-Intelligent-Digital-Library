@@ -32,7 +32,9 @@ def get_qdrant_client() -> QdrantClient:
     """Helper to get the Qdrant client."""
     return QdrantClient(
         url=settings.QDRANT_URL,
-        api_key=settings.QDRANT_API_KEY
+        api_key=settings.QDRANT_API_KEY,
+        # Suppress warning if minor version differs between client and server
+        check_compatibility=False,
     )
 
 

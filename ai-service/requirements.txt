@@ -22,8 +22,6 @@ langchain-google-genai==2.1.12
 langchain-huggingface==0.1.2
 langchain-qdrant==0.2.0
 
-# Vector store client — MUST match Qdrant Cloud server version (1.17.x)
-# Old 1.14.2 caused: "client version incompatible with server version 1.17.1"
 qdrant-client==1.17.1
 
 # Embeddings / ML

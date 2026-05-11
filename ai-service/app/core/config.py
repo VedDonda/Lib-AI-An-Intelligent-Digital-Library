@@ -1,10 +1,7 @@
-import os
 from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    """Application settings loaded from environment variables."""
-
     GOOGLE_API_KEY: str = ""
     HUGGINGFACEHUB_API_TOKEN: str = ""
     QDRANT_URL: str = ""

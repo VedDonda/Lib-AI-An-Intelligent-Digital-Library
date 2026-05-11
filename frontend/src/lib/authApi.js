@@ -77,7 +77,7 @@ export const refreshTokenRequest = async () => {
 };
 
 export const forgotPasswordRequest = async ({ email }) => {
-  const response = await fetch(`${API_BASE_URL}/api/v1/users/forgot-password`, {
+  const response = await fetch(`${API_BASE_URL}/users/forgot-password`, {
     method: "POST",
     headers: buildHeaders(),
     credentials: "include",
@@ -87,7 +87,7 @@ export const forgotPasswordRequest = async ({ email }) => {
 };
 
 export const verifyForgotPasswordOtpRequest = async ({ email, otp }) => {
-  const response = await fetch(`${API_BASE_URL}/api/v1/users/forgot-password/verify-otp`, {
+  const response = await fetch(`${API_BASE_URL}/users/forgot-password/verify-otp`, {
     method: "POST",
     headers: buildHeaders(),
     credentials: "include",
@@ -97,7 +97,7 @@ export const verifyForgotPasswordOtpRequest = async ({ email, otp }) => {
 };
 
 export const resetPasswordRequest = async ({ email, resetToken, newPassword }) => {
-  const response = await fetch(`${API_BASE_URL}/api/v1/users/forgot-password/reset`, {
+  const response = await fetch(`${API_BASE_URL}/users/forgot-password/reset`, {
     method: "POST",
     headers: buildHeaders(),
     credentials: "include",

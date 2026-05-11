@@ -38,6 +38,8 @@ const BookQnAComponent = ({ bookId, book, onClose, onPageClick }) => {
     useEffect(() => {
         if (!book) return;
 
+        let pollInterval = null;
+
         const startIngestion = async () => {
             try {
                 setIngestionStatus("checking");
@@ -51,23 +53,23 @@ const BookQnAComponent = ({ bookId, book, onClose, onPageClick }) => {
                 setIngestionStatus("ingesting");
                 await ingestBook(bookId, book.pdfUrl);
 
-                const pollInterval = setInterval(async () => {
+                let polls = 0;
+                const MAX_POLLS = 60;
+
+                pollInterval = setInterval(async () => {
+                    polls++;
                     try {
                         const s = await checkIngestionStatus(bookId);
                         if (s.isIngested) {
                             setIngestionStatus("ready");
                             clearInterval(pollInterval);
+                        } else if (polls >= MAX_POLLS) {
+                            clearInterval(pollInterval);
+                            setIngestionStatus("error");
                         }
                     } catch {
                     }
-                }, 3000);
-
-                setTimeout(() => {
-                    clearInterval(pollInterval);
-                    if (ingestionStatus !== "ready") {
-                        setIngestionStatus("error");
-                    }
-                }, 300000);
+                }, 5000);
             } catch (err) {
                 console.error("Ingestion error:", err);
                 setIngestionStatus("error");
@@ -75,6 +77,10 @@ const BookQnAComponent = ({ bookId, book, onClose, onPageClick }) => {
         };
 
         startIngestion();
+
+        return () => {
+            if (pollInterval) clearInterval(pollInterval);
+        };
     }, [book, bookId]);
 
     const handleSubmit = async (e) => {

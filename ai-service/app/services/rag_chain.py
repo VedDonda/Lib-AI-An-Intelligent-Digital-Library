@@ -6,6 +6,7 @@ Orchestrates the retrieval + LLM generation pipeline using LangChain and Gemini.
 from typing import List, Optional
 import os
 import json
+import asyncio
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.prompts import PromptTemplate
 from langchain.schema import Document
@@ -18,7 +19,8 @@ def get_llm():
     return ChatGoogleGenerativeAI(
         model="gemini-2.5-flash", 
         temperature=0.3,
-        google_api_key=os.getenv("GOOGLE_API_KEY") or settings.GOOGLE_API_KEY
+        google_api_key=os.getenv("GOOGLE_API_KEY") or settings.GOOGLE_API_KEY,
+        request_timeout=45
     )
 
 
@@ -58,24 +60,30 @@ def format_context(documents: List[Document]) -> str:
 
 async def get_search_params(llm, question: str) -> dict:
     """Uses the LLM to parse the user's question into searchable parameters."""
-    prompt_template = PromptTemplate(
-        input_variables=["question"],
-        template=QUERY_PLANNER_PROMPT
-    )
-    formatted = prompt_template.format(question=question)
-    response = await llm.ainvoke(formatted)
-    text = response.content.strip()
-    
-    # Strip markdown code blocks if the LLM adds them
-    if text.startswith("```json"):
-        text = text[7:]
-    elif text.startswith("```"):
-        text = text[3:]
-    if text.endswith("```"):
-        text = text[:-3]
-        
     try:
+        prompt_template = PromptTemplate(
+            input_variables=["question"],
+            template=QUERY_PLANNER_PROMPT
+        )
+        formatted = prompt_template.format(question=question)
+        response = await asyncio.wait_for(
+            llm.ainvoke(formatted),
+            timeout=15
+        )
+        text = response.content.strip()
+        
+        # Strip markdown code blocks if the LLM adds them
+        if text.startswith("```json"):
+            text = text[7:]
+        elif text.startswith("```"):
+            text = text[3:]
+        if text.endswith("```"):
+            text = text[:-3]
+            
         return json.loads(text.strip())
+    except asyncio.TimeoutError:
+        print(f"Query planner timeout for: {question}")
+        return {"semantic_query": question, "target_pages": []}
     except Exception as e:
         print(f"Failed to parse query planner JSON: {e}")
         return {"semantic_query": question, "target_pages": []}
@@ -94,8 +102,11 @@ async def get_answer(
     """
     llm = get_llm()
     
-    # Step 1: LLM Planner decides how to search
-    params = await get_search_params(llm, question)
+    # Step 1: LLM Planner decides how to search (with timeout)
+    params = await asyncio.wait_for(
+        get_search_params(llm, question),
+        timeout=20
+    )
     semantic_query = params.get("semantic_query", "")
     target_pages = params.get("target_pages", [])
     
@@ -103,8 +114,28 @@ async def get_answer(
     if not semantic_query.strip() and not target_pages:
         semantic_query = question
 
-    # Step 2: Retrieve relevant chunks dynamically based on the plan
-    relevant_docs = similarity_search(book_id, semantic_query, k=5, target_pages=target_pages)
+    # Step 2: Retrieve relevant chunks dynamically based on the plan (timeout)
+    try:
+        relevant_docs = await asyncio.wait_for(
+            asyncio.to_thread(
+                similarity_search,
+                book_id,
+                semantic_query,
+                5,
+                target_pages
+            ),
+            timeout=15
+        )
+    except asyncio.TimeoutError:
+        print(f"Vector search timeout for book {book_id}")
+        relevant_docs = []
+
+    # If no docs found, return helpful error
+    if not relevant_docs:
+        return {
+            "answer": "I couldn't find relevant information in this book to answer your question. Try rephrasing your question or asking about a different topic covered in the book.",
+            "sourcePages": []
+        }
 
     # Step 3: Format context and build prompt
     context = format_context(relevant_docs)
@@ -120,11 +151,20 @@ async def get_answer(
         chat_history=history_str,
         question=question
     )
-    # print(formatted_prompt)
-    # Step 4: Get answer from Stable Gemini API
-    # The llm object is already retrieved above
-    response = await llm.ainvoke(formatted_prompt)
-    answer_text = response.content
+    
+    # Step 4: Get answer from Gemini API (with timeout)
+    try:
+        response = await asyncio.wait_for(
+            llm.ainvoke(formatted_prompt),
+            timeout=25
+        )
+        answer_text = response.content
+    except asyncio.TimeoutError:
+        print(f"LLM response timeout for book {book_id}")
+        return {
+            "answer": "I'm taking longer than expected to generate an answer. Please try again.",
+            "sourcePages": []
+        }
 
     # Extract unique page numbers from sources
     source_pages = sorted(set(

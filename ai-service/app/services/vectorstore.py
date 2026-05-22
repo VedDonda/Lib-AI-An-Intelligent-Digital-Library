@@ -1,3 +1,4 @@
+import asyncio
 import uuid
 from typing import List
 
@@ -30,6 +31,7 @@ def get_qdrant_client() -> QdrantClient:
         url=settings.QDRANT_URL,
         api_key=settings.QDRANT_API_KEY,
         check_compatibility=False,
+        timeout=30  # Add timeout to Qdrant operations
     )
 
 
@@ -37,20 +39,24 @@ def _collection_exists(client: QdrantClient, collection_name: str) -> bool:
     try:
         existing = [c.name for c in client.get_collections().collections]
         return collection_name in existing
-    except Exception:
+    except Exception as e:
+        print(f"Error checking collection: {e}")
         return False
 
 
 def _ensure_collection(client: QdrantClient, collection_name: str):
     if not _collection_exists(client, collection_name):
-        client.create_collection(
-            collection_name=collection_name,
-            vectors_config=models.VectorParams(
-                size=384,
-                distance=models.Distance.COSINE
+        try:
+            client.create_collection(
+                collection_name=collection_name,
+                vectors_config=models.VectorParams(
+                    size=384,
+                    distance=models.Distance.COSINE
+                )
             )
-        )
-        print(f"Created Qdrant collection: {collection_name}")
+            print(f"Created Qdrant collection: {collection_name}")
+        except Exception as e:
+            print(f"Error creating collection: {e}")
 
 
 def _ensure_payload_indexes(client: QdrantClient):
@@ -148,46 +154,51 @@ def create_vector_store(book_id: str, chunks: List[Document]) -> int:
 
 
 def similarity_search(book_id: str, query: str, k: int = 5, target_pages: List[int] = None) -> List[Document]:
-    client = get_qdrant_client()
-    embeddings = get_embeddings()
+    """Synchronous wrapper for vector search - blocking call"""
+    try:
+        client = get_qdrant_client()
+        embeddings = get_embeddings()
 
-    search_query = query if query.strip() else "content"
-    query_vector = embeddings.embed_query(search_query)
+        search_query = query if query.strip() else "content"
+        query_vector = embeddings.embed_query(search_query)
 
-    filter_conditions = [
-        models.FieldCondition(
-            key="metadata.book_id",
-            match=models.MatchValue(value=book_id)
-        )
-    ]
-
-    if target_pages:
-        filter_conditions.append(
+        filter_conditions = [
             models.FieldCondition(
-                key="metadata.page",
-                match=models.MatchAny(any=target_pages)
+                key="metadata.book_id",
+                match=models.MatchValue(value=book_id)
             )
-        )
-        k = max(k, len(target_pages) * 20)
+        ]
 
-    search_filter = models.Filter(must=filter_conditions)
+        if target_pages:
+            filter_conditions.append(
+                models.FieldCondition(
+                    key="metadata.page",
+                    match=models.MatchAny(any=target_pages)
+                )
+            )
+            k = max(k, len(target_pages) * 20)
 
-    results = client.query_points(
-        collection_name="books",
-        query=query_vector,
-        query_filter=search_filter,
-        limit=k
-    ).points
+        search_filter = models.Filter(must=filter_conditions)
 
-    documents = [
-        Document(
-            page_content=r.payload["page_content"],
-            metadata=r.payload["metadata"]
-        )
-        for r in results
-    ]
+        results = client.query_points(
+            collection_name="books",
+            query=query_vector,
+            query_filter=search_filter,
+            limit=k
+        ).points
 
-    pages = sorted(set(doc.metadata.get("page", 0) for doc in documents))
-    print(f"Found {len(documents)} relevant chunks from pages: {pages} for book {book_id}")
+        documents = [
+            Document(
+                page_content=r.payload["page_content"],
+                metadata=r.payload["metadata"]
+            )
+            for r in results
+        ]
 
-    return documents
+        pages = sorted(set(doc.metadata.get("page", 0) for doc in documents))
+        print(f"Found {len(documents)} relevant chunks from pages: {pages} for book {book_id}")
+
+        return documents
+    except Exception as e:
+        print(f"Error in similarity_search: {e}")
+        return []

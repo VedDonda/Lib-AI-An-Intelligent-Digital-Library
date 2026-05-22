@@ -28,7 +28,7 @@ ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://localhost:3000",
     "http://localhost:8000",
-    "https://lib-ai-library.vercel.app",
+    "https://lib-ai-digital-library.vercel.app",
 ] + _extra
 
 app.add_middleware(

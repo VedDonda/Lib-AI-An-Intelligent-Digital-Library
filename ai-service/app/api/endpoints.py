@@ -1,4 +1,6 @@
-from fastapi import APIRouter, BackgroundTasks, HTTPException
+from fastapi import APIRouter, BackgroundTasks, HTTPException, Request
+from fastapi.responses import JSONResponse
+import asyncio
 from app.schemas.models import (
     IngestRequest, IngestResponse,
     AskRequest, AskResponse,
@@ -11,6 +13,9 @@ from app.services.vectorstore import (
 from app.services.rag_chain import get_answer
 
 router = APIRouter()
+
+# Timeout in seconds for query processing
+QUERY_TIMEOUT = 60  # 60 seconds max for query
 
 
 def run_ingestion_pipeline(book_id: str, pdf_url: str):
@@ -85,11 +90,22 @@ async def ask_question(request: AskRequest):
             for msg in (request.chatHistory or [])
         ]
 
-        result = await get_answer(
-            book_id=request.bookId,
-            question=request.question,
-            chat_history=chat_history
-        )
+        # Add timeout protection for query processing
+        try:
+            result = await asyncio.wait_for(
+                get_answer(
+                    book_id=request.bookId,
+                    question=request.question,
+                    chat_history=chat_history
+                ),
+                timeout=QUERY_TIMEOUT
+            )
+        except asyncio.TimeoutError:
+            print(f"Query timeout after {QUERY_TIMEOUT}s for book {request.bookId}")
+            raise HTTPException(
+                status_code=504,
+                detail=f"Query processing took too long. Please try again. (Timeout after {QUERY_TIMEOUT}s)"
+            )
 
         return AskResponse(
             answer=result["answer"],

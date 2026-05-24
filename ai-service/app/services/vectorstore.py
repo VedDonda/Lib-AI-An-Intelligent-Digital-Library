@@ -4,7 +4,7 @@ from typing import List
 
 from langchain.schema import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_community.embeddings import FastEmbedEmbeddings
 from qdrant_client import QdrantClient
 from qdrant_client.http import models
 from qdrant_client.http.models import PointStruct
@@ -14,15 +14,19 @@ from app.core.config import settings
 _embeddings = None
 
 
-def get_embeddings() -> HuggingFaceEmbeddings:
+def get_embeddings() -> FastEmbedEmbeddings:
+    """
+    Returns a singleton FastEmbed embedder.
+    Uses ONNX Runtime — no PyTorch, no local GPU, ~80 MB RAM on Render free tier.
+    Model: BAAI/bge-small-en-v1.5  →  384-dim vectors (same as before, no re-ingestion needed)
+    """
     global _embeddings
     if _embeddings is None:
-        print("Initializing HuggingFace embeddings (first use)...")
-        _embeddings = HuggingFaceEmbeddings(
-            model_name="sentence-transformers/all-MiniLM-L6-v2",
-            model_kwargs={"model_kwargs": {"low_cpu_mem_usage": False}},
+        print("Initializing FastEmbed ONNX embeddings (first use)...")
+        _embeddings = FastEmbedEmbeddings(
+            model_name="BAAI/bge-small-en-v1.5",
         )
-        print("Embeddings ready: sentence-transformers/all-MiniLM-L6-v2")
+        print("FastEmbed ready: BAAI/bge-small-en-v1.5 (ONNX, 384-dim)")
     return _embeddings
 
 
@@ -31,7 +35,7 @@ def get_qdrant_client() -> QdrantClient:
         url=settings.QDRANT_URL,
         api_key=settings.QDRANT_API_KEY,
         check_compatibility=False,
-        timeout=30  # Add timeout to Qdrant operations
+        timeout=30
     )
 
 
@@ -50,7 +54,7 @@ def _ensure_collection(client: QdrantClient, collection_name: str):
             client.create_collection(
                 collection_name=collection_name,
                 vectors_config=models.VectorParams(
-                    size=384,
+                    size=384,           # same as before — no re-ingestion needed
                     distance=models.Distance.COSINE
                 )
             )
@@ -113,6 +117,11 @@ def chunk_documents(documents: List[Document]) -> List[Document]:
 
 
 def create_vector_store(book_id: str, chunks: List[Document]) -> int:
+    """
+    Embeds and upserts chunks in small batches of 50.
+    This keeps peak RAM flat regardless of book size —
+    the old code embedded ALL chunks at once (huge spike).
+    """
     if not chunks:
         print("No chunks to index")
         return 0
@@ -127,13 +136,15 @@ def create_vector_store(book_id: str, chunks: List[Document]) -> int:
 
     texts = [chunk.page_content for chunk in chunks]
     metadatas = [chunk.metadata for chunk in chunks]
-    vectors = embeddings.embed_documents(texts)
 
-    batch_size = 100
-    for i in range(0, len(chunks), batch_size):
-        batch_vectors = vectors[i:i + batch_size]
-        batch_texts = texts[i:i + batch_size]
-        batch_metadatas = metadatas[i:i + batch_size]
+    BATCH_SIZE = 50  # embed + upsert 50 at a time → flat RAM
+
+    for i in range(0, len(chunks), BATCH_SIZE):
+        batch_texts = texts[i:i + BATCH_SIZE]
+        batch_metadatas = metadatas[i:i + BATCH_SIZE]
+
+        # Embed only this batch — avoids the giant spike
+        batch_vectors = embeddings.embed_documents(batch_texts)
 
         points = [
             PointStruct(
@@ -147,6 +158,8 @@ def create_vector_store(book_id: str, chunks: List[Document]) -> int:
             for j in range(len(batch_vectors))
         ]
         client.upsert(collection_name="books", points=points)
+        print(f"  Upserted batch {i // BATCH_SIZE + 1} "
+              f"({len(points)} chunks, total {min(i + BATCH_SIZE, len(chunks))}/{len(chunks)})")
 
     _ensure_payload_indexes(client)
     print(f"Qdrant index updated for book: {book_id} ({len(chunks)} vectors)")

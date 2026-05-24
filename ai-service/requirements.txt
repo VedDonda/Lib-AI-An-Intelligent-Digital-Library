@@ -12,17 +12,15 @@ pydantic-settings==2.9.1
 pymupdf==1.25.5
 
 # ── LangChain ecosystem ────────────────────────────────────────────────────────
-# ALL packages MUST be pinned together to avoid pip backtracking timeouts.
 langchain==0.3.25
 langchain-community==0.3.24
 langchain-core==0.3.84
 langchain-text-splitters==0.3.11
 langsmith==0.3.45
 langchain-google-genai==2.1.12
-langchain-huggingface==0.1.2
 langchain-qdrant==0.2.0
 
 qdrant-client==1.17.1
 
-# Embeddings / ML
-sentence-transformers==3.4.1
+# ── Embeddings — ONNX-based, NO PyTorch, ~80 MB RAM ───────────────────────────
+fastembed==0.4.2
